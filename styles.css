@@ -21,9 +21,9 @@ html {
 
 body {
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--text-color);
-    font-size: 15px;
+    font-size: 13px;
 }
 
 /* Navigation */
@@ -55,7 +55,7 @@ nav a {
     color: #4a4a4a;
     font-weight: 600;
     transition: none;
-    font-size: 1rem;
+    font-size: 0.9rem;
     position: relative;
 }
 
@@ -105,8 +105,8 @@ nav a:hover {
 .hero-content h1 {
     color: #2c3e50;
     font-weight: 700;
-    margin-bottom: 1.5rem;
-    font-size: 2.8rem;
+    margin-bottom: 1.2rem;
+    font-size: 2.2rem;
     line-height: 1.1;
     letter-spacing: -0.5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
@@ -114,7 +114,7 @@ nav a:hover {
 
 .hero-content p {
     color: #2c3e50;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     font-weight: 500;
     line-height: 1.2;
     margin: 0 auto;
@@ -149,8 +149,8 @@ nav a:hover {
 .section h2 {
     text-align: center;
     color: var(--academic-blue);
-    margin-bottom: 2rem;
-    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
@@ -394,9 +394,9 @@ nav a:hover {
 }
 
 .about-text p {
-    font-size: 18px;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
     text-align: justify;
 }
 
@@ -700,8 +700,8 @@ nav a:hover {
 
 .procedure-section p {
     font-weight: 500;
-    margin-bottom: 1.2rem;
-    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
     color: #2c3e50;
 }
 
@@ -711,23 +711,23 @@ nav a:hover {
 }
 
 .procedure-section li {
-    margin-bottom: 0.8rem;
-    line-height: 1.6;
-    font-size: 1rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+    font-size: 0.85rem;
     color: #2c3e50;
 }
 
 .project-content h2 {
     color: var(--primary-color);
-    margin: 2rem 0 1.2rem;
-    font-size: 1.7rem;
+    margin: 1.5rem 0 1rem;
+    font-size: 1.4rem;
     font-weight: 700;
 }
 
 .project-content h3 {
     color: var(--primary-color);
-    margin: 1.5rem 0 1rem;
-    font-size: 1.4rem;
+    margin: 1.2rem 0 0.8rem;
+    font-size: 1.2rem;
     font-weight: 700;
 }
 
@@ -798,9 +798,9 @@ nav a:hover {
 /* Removed hover animation */
 
 .interest-item i, .interest-item .custom-icon {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: var(--secondary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .custom-icon {
@@ -810,8 +810,8 @@ nav a:hover {
 
 .interest-item h4 {
     color: var(--primary-color);
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
 }
 
 /* Project detail page image grid */
