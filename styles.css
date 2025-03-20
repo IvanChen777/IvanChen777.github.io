@@ -71,7 +71,7 @@ nav a:hover {
 /* Hero Section */
 .hero {
     height: 100vh;
-    background-image: url('assets/mainpage.JPG');
+    background-image: url('assets/optimized/mainpage-compressed.jpg');
     background-size: cover;
     background-position: center;
     display: flex;
