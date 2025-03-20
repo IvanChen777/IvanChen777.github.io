@@ -1,0 +1,98 @@
+<!--
+ * @Author: IvanChen777 yifeng.chen@epfl.ch
+ * @Date: 2025-03-18 04:50:55
+ * @LastEditors: IvanChen777 yifeng.chen@epfl.ch
+ * @LastEditTime: 2025-03-19 05:03:02
+ * @FilePath: /Coding Preparation/webpage_code_v3/projects/vehicle-occlusion.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generating Occlusion-free Vehicle Images From Occluded Vehicle Images Based on the Drone Dataset</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Generating Occlusion-free Vehicle Images From<br>Occluded Vehicle Images Based on the Drone<br>Dataset</h1>
+            </div>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL LUTS Lab</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Sep. 2022 - Feb. 2023</div>
+            </div>
+        </div>
+
+        <div class="project-content">
+            <div class="project-summary">
+                <h2>Project Overview</h2>
+                <p>Occluded vehicles, as a common phenomenon in the drone dataset, have a negative impact on traffic monitoring in Unmanned Aerial Systems. Due to the lack of occluded-free and occluded pair vehicle datasets, few researchers focus on solving the vehicle occlusion removal problem. Nevertheless, several types of research focus on solving the occluded faces problems and achieving significant results. To this end, we build our own occluded vehicle dataset on this project. Besides, inspired by the occluded faces removing problem, we propose an updated context encoder – a convolutional neural network trained to generate the contents of an arbitrary image region conditioned on its surroundings. Compared to the original context encoder, which could reconstruct the image based on a fixed-size binary mask in a fixed location, our updated context encoder could reconstruct the image based on a flexible fixed-size mask with a random location. Sharper results could be obtained by implementing the pixel-wise reconstruction loss and an adversarial loss. We create an occluded vehicle dataset from the Pully dataset and several occlusions. We evaluate the performance of the pre- trained context encoder on the occluded vehicle image dataset, including tree and shadow. The experimental results demonstrate that our work can effectively reconstruct the vehicle image.</p>
+            </div>
+
+            <div class="project-details">
+                <h2>Key Challenges</h2>
+                <ul>
+                    <li>Varying shapes and locations of occlusions (trees, shadows)</li>
+                    <li>Complex reconstruction of vehicle details</li>
+                    <li>Limited availability of paired occluded/non-occluded vehicle datasets</li>
+                </ul>
+
+                <h2>Training Pipeline</h2>
+                <div class="image-section">
+                    <img src="../assets/Occlusion-free Vehicle Images/Generating_occlusion-free vehicle_images_from_occluded_vehicle_images_based_on_the drone_dataset/contents/training pipeline.png" alt="Training Pipeline" class="project-image">
+                    <p class="image-caption">Training Pipeline of the Context Encoder Network</p>
+                </div>
+                
+                <div class="procedure-section">
+                   
+                    <ul>
+                        <li>Image preprocessing: Resizing to 128x128 pixels for consistent processing</li>
+                        <li>Network architecture based on Context-Encoder with modifications</li>
+                        <li>Custom loss function combining reconstruction and adversarial losses</li>
+                    </ul>
+                </div>
+
+                
+
+                <h3>Dataset Creation</h3>
+                <div class="image-section">
+                    <img src="../assets/Occlusion-free Vehicle Images/Generating_occlusion-free vehicle_images_from_occluded_vehicle_images_based_on_the drone_dataset/contents/Dataset creation pipeline.png" alt="Dataset Creation Pipeline" class="project-image">
+                    <p class="image-caption">Dataset Creation Pipeline</p>
+                </div>
+                
+                <div class="procedure-section">
+                    <p>The dataset creation procedure is as follows:</p>
+                    <ul>
+                        <li>Generate the vehicle image and occlusion randomly from the vehicle images dataset and occlusion images dataset.</li>
+                        <li>Normalize the vehicle image to the size of 128 pixels × 128 pixels.</li>
+                        <li>Normalize the occlusion image to the size of 64 pixels × 64 pixels and rotate it at a random angle.</li>
+                        <li>Put the occlusion patch into the vehicle location in a random location and output the occluded vehicle image and the coordinates of the left-upper point of occlusion in the occluded vehicle image.</li>
+                    </ul>
+                </div>
+
+                <h2>Results</h2>
+                <div class="image-section">
+                    <img src="../assets/Occlusion-free Vehicle Images/Generating_occlusion-free vehicle_images_from_occluded_vehicle_images_based_on_the drone_dataset/contents/results.png" alt="Results Comparison" class="project-image">
+                    <p class="image-caption">The results comparison First row: the vehicle with occlusion, Second row: the predicting results, Third row: the ground truth.</p>
+                </div>
+                
+                <p>From the results, we could see, the main features of the occluded parts are restored successfully, especially if the occluded area contains only one colour, the predicted image and ground truth are hard to tell the difference visually.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="../index.html#projects" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </footer>
+</body>
+</html>

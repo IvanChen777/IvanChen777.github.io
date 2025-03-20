@@ -1,0 +1,128 @@
+\section{Module Implementation}
+
+We implemented modules \textbf{Conv2d}, \textbf{Upsampling}, \textbf{ReLU}, \textbf{Sigmoid}, \textbf{MSE},  \textbf{Sequential}, all of which inherit from base class \textbf{Module}, and optimizer \textbf{SGD}.
+
+\subsection{Module}
+
+All subclasses of \textbf{module} should implement methods \textbf{forward}, \textbf{backward} and \textbf{param}. 
+
+- \textbf{forward} method do calculations on the input and return the result, which will be passed to the next layer. 
+
+- \textbf{backward} method calculate the loss gradient w.r.t the parameters as well as the input tensor based on the gradient w.r.t the output of this layer. 
+
+- \textbf{param} method return the parameters of this layer. In this project, only \textbf{Conv2d} and \textbf{Upsampling} have parameters. 
+
+
+
+\subsection{Conv2d}
+
+\textbf{Conv2d} module do convolution on the input tensors. 
+
+- For \textbf{forward}, the formula is 
+\begin{equation}
+    Z=W*A+b
+\end{equation}
+ where $*$ stands for convolution. We use the method mentioned in the appendix of the project description to convert the convolution operation to matrix multiplication, which speed up the computation a lot compared to using for-loop to do convolution. 
+
+- For \textbf{backward}, the formula is 
+\begin{equation}
+    \delta_{out_{i}}=\Sigma_m\delta_{in_m}*W_{im}^{(rot180)}
+\end{equation}
+\begin{equation}
+    \delta_w=A*\delta_{in} 
+\end{equation}
+\begin{equation}
+    \delta_b=\Sigma_x\Sigma_y\delta_{in}
+\end{equation}
+We also use the unfolded matrix multiplication to do convolution.
+
+- For \textbf{param}, it returns a 2d list, whose format is [[weight, weight gradient], [bias, bias gradient]].
+
+This weights and biases of this module is initialized by Xavier initialization, which are initialised by Gaussian distribution, the mean iszero, and the variance is $\sqrt{\frac{2}{m+n}}$
+
+
+
+\subsection{Upsampling}
+
+This layer consists of an NNUpsampling layer and a Conv2d layer.
+
+For \textbf{NNUpsampling} layer:
+
+- The \textbf{forward} method resize the tensor by a scale factor and interpolate the tensor with the value of the nearest element. 
+
+- The \textbf{backward} method, conversely, sum up the gradients of one neighbourhood into one element. 
+
+For these two methods, we tried the for-loop implementation, which is too slow to work. So we exploit the \textbf{repeat interleave} method to do interplolating and \textbf{unfold} method to do gradient calculation.
+
+
+
+\subsection{ReLU}
+
+- For \textbf{forward}, it returns the relu function value of the input, 
+\begin{equation}
+    Relu(x)=\max(0, x)
+\end{equation}
+
+- For \textbf{backward}, the gradient formula is 
+\begin{equation}
+    \delta_{out}=\max(0, x)\delta_{in}
+\end{equation}
+
+
+
+
+\subsection{Sigmoid}
+
+- For \textbf{forward}, it returns the sigmoid function value of the input,
+\begin{equation}
+    \sigma(x)= 1/(1+e^{-x})
+\end{equation}
+
+- For \textbf{backward}, the gradient formula is 
+\begin{equation}
+    \delta_{out}=\sigma(x)(1-\sigma(x))\delta_{in}
+\end{equation}
+
+
+
+\subsection{Mean Square Error}
+
+- For \textbf{forward}, given input and target, it returns the MSE loss, 
+\begin{equation}
+    \l(x, y)=\frac{\Sigma_i(x_i-y_i)^2}{n}
+\end{equation}
+
+
+- For \textbf{backward}, the gradient formula is
+\begin{equation}
+    \delta_{out}=\frac{2(x-y)}{n}
+\end{equation}
+
+
+\subsection{Sequential}
+
+This layer is a list of modules. 
+
+- For \textbf{forward}, it passes the input through the modules. 
+
+- For \textbf{backward}, it passes the gradient through the modules reversely. 
+
+- For \textbf{param}, it returns all the parameters and their gradients of the modules.
+
+
+
+\subsection{Stochastic gradient descent}
+
+\textbf{SGD} is an optimizer. It receives the parameters of the modules when it is constructed and updates the parameters. The formula is  
+\begin{equation}
+    \theta_t=\theta_{t-1}-\gamma g_t
+\end{equation}
+$\gamma$ is learning rate, when its \textbf{step} method is called. Before backwarding the modules, its \textbf{zero grad} method should be called. 
+
+
+
+
+
+
+
+

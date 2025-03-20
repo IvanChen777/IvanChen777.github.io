@@ -1,0 +1,109 @@
+\documentclass[10pt,conference,compsocconf]{IEEEtran}
+%\documentclass[journal]{IEEEtran}
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{amsmath}
+\usepackage{diagbox}
+\usepackage{bm}
+\usepackage{algorithmic,algorithm}
+\usepackage{etoolbox}
+\usepackage{color,xcolor}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{gensymb}
+
+\usepackage{array}
+\usepackage{makecell}
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[1.5pt]}
+\renewcommand\cellgape{\Gape[1pt]}
+
+\renewcommand{\arraystretch}{1.25}
+
+
+\begin{document}
+\title{SNIP: Single-Shot Network Pruning Based on Connection Sensitivity \\ CS-439 Optimization for Machine Learning -- Class Project}
+
+\author{
+  Aoyu Gong, Sijia Du, Qiyuan Dong\\
+  \textit{School of Computer and Communication Sciences, EPFL, Switzerland}
+}
+
+\maketitle
+
+\begin{abstract}
+    TBA
+\end{abstract}
+
+
+\section{Introduction} \label{sec:Introduction}
+TBA \cite{lee2018snip}
+
+
+\section{Neural Network Pruning} \label{sec:NeuralNetworkPruning}
+TBA
+
+
+\section{Experiments} \label{sec:Experiments}
+TBA
+
+\subsection{Comparisons under Varied Sparsity} \label{sec:VariedSparsity}
+TBA
+
+\subsection{Comparisons with Various Architectures} \label{sec:VariousArchitectures}
+TBA
+
+\begin{table*}
+    \centering
+    \begin{tabular}{cccccc}
+        \hline
+        Architecture                   & Model & Sparsity (\%) & \# Parameters & Error (\%) & $\Delta$ \\ \hline
+        \multirow{5}{*}{Convolutional} & AlexNet-s   & $90$      & tba        & tba   & tba   \\
+                                       & AlexNet-b   & $90$      & tba        & tba   & tba   \\
+                                       & VGG-C   & $95$      & tba        & tba   & tba   \\
+                                       & VGG-D   & $95$      & tba        & tba   & tba   \\
+                                       & VGG-like   & $97$      & tba        & tba   & tba   \\ \hline
+        \multirow{2}{*}{Residual}      & ResNet-18   & $95$      & $1.10 \times 10^7 \to 5.50 \times 10^5$       & tba   & tba   \\
+                                       & ResNet-34   & $95$      & tba        & tba   & tba   \\ \hline
+        \multirow{2}{*}{Squeeze}       & SqueezeNet-vanilla   & $95$      & tba        & tba   & tba   \\
+                                       & SqueezeNet-bypass   & $95$      & tba        & tba   & tba   \\ \hline
+        \multirow{1}{*}{Inception}     & GoogLeNet   & $95$      & tba        & tba   & tba   \\ \hline
+        \multirow{2}{*}{Dense}       & DenseNet-121   & $95$      & tba        & tba   & tba   \\
+                                       & DenseNet-169   & $95$      & tba        & tba   & tba   \\ \hline
+    \end{tabular}
+    \caption{Pruning results of the introduced approach on various modern architectures (before $\to$ after).}
+    \label{table:VariousArchitectures}
+\end{table*}
+
+\subsection{Understanding Which Connections Are Being Pruned} \label{sec:WhichConnectionsBeingPruned}
+TBA
+
+\subsection{Effects of Data and Weight Initialization} \label{sec:EffectsDataWeightInitialization}
+TBA
+
+\subsection{Fitting Random Labels} \label{sec:FittingRandomLabels}
+TBA
+
+
+\section{Conclusion} \label{sec:Conclusion}
+TBA
+
+
+\section*{Acknowledgements}
+The authors thank the \href{https://people.epfl.ch/nicolas.flammarion}{TML} and \href{https://www.epfl.ch/labs/mlo/}{MLO} groups for their careful guidance.
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{literature}
+
+%\onecolumn
+%\appendices
+
+\end{document}

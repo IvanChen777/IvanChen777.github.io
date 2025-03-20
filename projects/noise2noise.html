@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noise2Noise Implementation - Project Details</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Noise2Noise Implementation from Scratch</h1>
+            </div>
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    
+                    <span>EPFL EE-559 DL</span>
+                </div>
+                <div class="metadata-item">
+                    
+                    <span></span>
+                </div>
+                <div class="metadata-item">
+                    
+                    <span>Spring 2023</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-content">
+            <div class="project-summary">
+                <h2>Project Overview</h2>
+                <p>This project focuses on implementing a deep learning framework for image denoising without using PyTorch's autograd or torch.nn modules. The goal was to develop a custom neural network architecture that could effectively remove noise from images using the Noise2Noise approach, where the network learns to map from one noisy image to another noisy image of the same scene.</p>
+                
+                <div class="project-highlights">
+                    <h3>Key Achievements</h3>
+                    <ul>
+                        <li>Custom implementation of neural network modules (Conv2d, ReLU, Sigmoid, etc.)</li>
+                        <li>Development of a simple but effective denoising architecture</li>
+                        <li>Achieved 22.81dB PSNR on the validation dataset</li>
+                        <li>Optimized implementation for processing speed (under 5 minutes per epoch)</li>
+                        <li>Comprehensive parameter analysis for optimal performance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="module-section">
+                <h2>Module Implementation</h2>
+                <p>We implemented several neural network modules from scratch, all inheriting from a base Module class. Each module implements forward, backward, and param methods for complete functionality.</p>
+                
+                
+
+                
+                    
+                    <div class="component-section">
+                        <h4>Conv2d</h4>
+                        <p>Implements 2D convolution using matrix multiplication for efficiency:</p>
+                        <ul>
+                            <li><strong>Forward:</strong> Z = W*A + b (using unfolded matrices)</li>
+                            <li><strong>Backward:</strong> Calculates gradients for weights, biases, and input</li>
+                            <li><strong>Initialization:</strong> Xavier initialization with Gaussian distribution</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>Upsampling</h4>
+                        <p>Combines nearest-neighbor upsampling with convolution:</p>
+                        <ul>
+                            <li><strong>Forward:</strong> Resizes tensor by scale factor using nearest-neighbor interpolation</li>
+                            <li><strong>Backward:</strong> Sums up gradients of one neighborhood into one element</li>
+                            <li><strong>Optimization:</strong> Uses repeat_interleave and unfold methods for speed</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>Activation Functions</h4>
+                        <ul>
+                            <li><strong>ReLU:</strong> max(0, x) with gradient calculation</li>
+                            <li><strong>Sigmoid:</strong> 1/(1+e^(-x)) with proper gradient implementation</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>Loss Function</h4>
+                        <p><strong>Mean Square Error (MSE):</strong></p>
+                        <ul>
+                            <li>Forward: Calculates average squared difference between predictions and targets</li>
+                            <li>Backward: Computes gradient 2(x-y)/n for backpropagation</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>Sequential & Optimizer</h4>
+                        <ul>
+                            <li><strong>Sequential:</strong> Chains modules together for forward and backward passes</li>
+                            <li><strong>SGD Optimizer:</strong> Updates parameters using θ_t = θ_{t-1} - γ·g_t</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="experiment-section">
+                <h2>Experiments & Results</h2>
+                
+                <div class="network-architecture">
+                    <h3>Network Architecture</h3>
+                    <div class="architecture-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Layer</th>
+                                    <th>Output Channels</th>
+                                    <th>Function</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Input</td>
+                                    <td>3</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Conv2d</td>
+                                    <td>44</td>
+                                    <td>Convolution 2×2</td>
+                                </tr>
+                                <tr>
+                                    <td>ReLU</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Conv2d</td>
+                                    <td>44</td>
+                                    <td>Convolution 2×2</td>
+                                </tr>
+                                <tr>
+                                    <td>ReLU</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Upsampling</td>
+                                    <td>44</td>
+                                    <td>Scale factor=2, Conv 3×3, padding=1</td>
+                                </tr>
+                                <tr>
+                                    <td>ReLU</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Upsampling</td>
+                                    <td>3</td>
+                                    <td>Scale factor=2, Conv 3×3, padding=1</td>
+                                </tr>
+                                <tr>
+                                    <td>Sigmoid</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="parameter-analysis">
+                    <h3>Parameter Analysis</h3>
+                    
+                    <div class="image-grid single-column">
+                        <div class="image-section">
+                            <img src="../assets/Miniproject2/contents/channels.png" alt="Impact of Channels" class="project-image">
+                            <p class="image-caption">Impact of channel count on PSNR and training time</p>
+                        </div>
+                    </div>
+                    
+                    <div class="image-grid single-column">
+                        <div class="image-section">
+                            <img src="../assets/Miniproject2/contents/lr.png" alt="Impact of Learning Rate" class="project-image">
+                            <p class="image-caption">Impact of learning rate on model performance</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-details">
+                        <h4>Key Findings</h4>
+                        <ul>
+                            <li><strong>Channel Count:</strong> 44 channels provided optimal balance between performance (PSNR) and training time</li>
+                            <li><strong>Learning Rate:</strong> 4.0 was found to be the optimal learning rate</li>
+                            <li><strong>Mini-batch Size:</strong> 4 samples per batch yielded the best results</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="denoising-results">
+                    <h3>Denoising Results</h3>
+                    <p>Our final model achieved an average PSNR of 22.81dB on the validation dataset. Below are examples of denoising results:</p>
+                    
+                    <div class="image-section full-width">
+                        <img src="../assets/Miniproject2/contents/comparison.png" alt="Denoising Results" class="project-image">
+                        <p class="image-caption">Comparison between noisy inputs (left), our predictions (middle), and ground truth (right). The PSNR values for these examples are 25.62dB, 24.77dB, and 26.32dB.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conclusion-section">
+                <h2>Conclusion</h2>
+                <p>In this project, we successfully implemented a deep learning framework from scratch for image denoising using the Noise2Noise approach. Our custom modules and network architecture achieved impressive results with a PSNR of 22.81dB on the validation dataset.</p>
+                
+                <p>The implementation provided valuable insights into the inner workings of neural networks and deep learning frameworks. By implementing backpropagation, optimization, and various neural network components manually, we gained a deeper understanding of these fundamental concepts.</p>
+                
+                <p>Our parameter analysis revealed important relationships between model complexity, learning rate, batch size, and denoising performance. These insights can guide future implementations and optimizations of similar architectures.</p>
+            </div>
+
+            <div class="references-section">
+                <h2>References</h2>
+                <ol>
+                    <li>Lehtinen, J., Munkberg, J., Hasselgren, J., Laine, S., Karras, T., Aittala, M., & Aila, T. (2018). Noise2Noise: Learning Image Restoration without Clean Data. arXiv preprint arXiv:1803.04189.</li>
+                </ol>
+            </div>
+
+            <div class="github-section">
+                <h2>Source Code</h2>
+                <div class="github-link">
+                    <a href="https://github.com/IvanChen777/Noise2Noise-Module-Implementation" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-github"></i>
+                        <span>Noise2Noise Implementation</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="../index.html#projects" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </footer>
+</body>
+</html>

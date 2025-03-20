@@ -1,0 +1,4 @@
+\section{Introduction}
+To obtain a better understanding of the libraries for deep learning like Pytorch, we develop some of the modules by ourselves for the second mini-project. In this project, we will implement our own framework to denoise images without using autograd or torch.nn modules.
+
+Instead of applying the Unet structure illustrated in mini-project 1, we implement a simple structure mentioned in the mini-project 2 description, which combines 2 convolutional layers, 3 Relu activation functions, 2 upsampling layers and 1 sigmoid activation function. Besides, mean square error loss criteria is applied and stochastic gradient descent optimizer is implemented. We train our architecture based on the train dataset(50000 samples) and test our architecture based on the validation dataset(1000 samples), and still get satisfied results, where psnr value is 22.81dB.

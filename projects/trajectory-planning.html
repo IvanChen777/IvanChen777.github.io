@@ -1,0 +1,364 @@
+<!--
+ * @Author: IvanChen777 yifeng.chen@epfl.ch
+ * @Date: 2025-03-18 04:50:55
+ * @LastEditors: IvanChen777 yifeng.chen@epfl.ch
+ * @LastEditTime: 2025-03-19 06:04:30
+ * @FilePath: /Coding Preparation/webpage_code_v3/projects/trajectory-planning.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open and Closed Loop Trajectory Planning</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Open and Closed Loop Trajectory Planning</h1>
+            </div>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL VITA Lab</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Sep. 2022 - Feb. 2023</div>
+            </div>
+        </div>
+
+        <div class="project-content">
+            <div class="project-summary">
+                <h2>Project Overview</h2>
+                <p>In this project, based on nuplan benchmarks, 3 neural networks (Raster model, LaneGCN model and Vision transformer model) are built in order to train a planner for solving autonomous vehicle planning problem. A high quality dataset with 1500h of human driving data from 4 cities across the US and Asia with widely varying traffic patterns is considered to train the planner and simulate the real scenario. 2 simulation methods (open-loop and closed-loop) are considered to simulate the real scenarios. Several metrics from open-loop and closed-loop are considered to evaluate each method. Finally, all planners' predicting results are visualized and compared.</p>
+            </div>
+
+            <div class="nuplan-framework">
+                <h2>nuPlan Framework</h2>
+                <p>Existing benchmarks (Argoverse, Lyft, Waymo) for autonomous vehicle motion prediction have focused on short-term motion forecasting of other agents rather than long-term planning of the ego vehicle. This has led previous works to use open-loop evaluation with L2-based metrics, which are not appropriate for fairly evaluating long-term planning.</p>
+                
+                <p>The nuPlan benchmark overcomes these limitations by providing:</p>
+                <ul>
+                    <li>A training framework to develop machine learning based planners</li>
+                    <li>A lightweight open-loop and closed-loop simulator</li>
+                    <li>Motion-planning specific metrics</li>
+                    <li>An interactive visualization tool</li>
+                </ul>
+
+                <div class="dataset-comparison">
+                    <h3>Dataset Comparison</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dataset</th>
+                                    <th>Data</th>
+                                    <th>Cities</th>
+                                    <th>Sensor Data</th>
+                                    <th>Type</th>
+                                    <th>Evaluation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Argoverse</td>
+                                    <td>320h</td>
+                                    <td>2</td>
+                                    <td></td>
+                                    <td>Pred</td>
+                                    <td>OL</td>
+                                </tr>
+                                <tr>
+                                    <td>nuPredict</td>
+                                    <td>5h</td>
+                                    <td>2</td>
+                                    <td>✓</td>
+                                    <td>Pred</td>
+                                    <td>OL</td>
+                                </tr>
+                                <tr>
+                                    <td>Lyft</td>
+                                    <td>1118h</td>
+                                    <td>1</td>
+                                    <td></td>
+                                    <td>Pred</td>
+                                    <td>OL</td>
+                                </tr>
+                                <tr>
+                                    <td>Waymo</td>
+                                    <td>570h</td>
+                                    <td>6</td>
+                                    <td></td>
+                                    <td>Pred</td>
+                                    <td>OL</td>
+                                </tr>
+                                <tr>
+                                    <td>nuPlan</td>
+                                    <td>1500h</td>
+                                    <td>4</td>
+                                    <td>✓</td>
+                                    <td>Plan</td>
+                                    <td>OL+CL</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="table-caption">Comparison between motion prediction (Pred) and planning (Plan) datasets. The table shows dataset size (hours), number of cities covered, availability of sensor data, dataset type, and evaluation methods used (OL: Open-Loop, CL: Closed-Loop).</p>
+                </div>
+
+                <div class="dataset-features">
+                    <h3>Dataset Features</h3>
+                    <ul>
+                        <li><strong>Diverse Data Collection:</strong> 1500 hours of data from Las Vegas, Boston, Pittsburgh, and Singapore, each providing unique driving challenges:</li>
+                        <ul>
+                            <li>Boston: Features drivers who frequently double park</li>
+                            <li>Singapore: Showcases left-hand traffic patterns</li>
+                        </ul>
+                        <li><strong>Rich Data Types:</strong>
+                            <ul>
+                                <li>Semantic maps with efficient query APIs</li>
+                                <li>LiDAR point clouds</li>
+                                <li>Localization information</li>
+                                <li>Camera images</li>
+                                <li>Steering inputs</li>
+                            </ul>
+                        </li>
+                        <li><strong>Automated Scenario Tagging:</strong> Complex scenarios are automatically annotated, including:
+                            <ul>
+                                <li>Lane changes and merges</li>
+                                <li>Protected/unprotected turns</li>
+                                <li>Interactions with cyclists and pedestrians</li>
+                                <li>Double-parked vehicle scenarios</li>
+                                <li>Stop-controlled intersections</li>
+                                <li>Construction zones</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h2>Network Architectures</h2>
+            
+            <h3>LaneGCN Model</h3>
+            <div class="image-section">
+                <img src="../assets/Trajectory Planning/nuplan/LaneGCN.png" alt="LaneGCN Architecture" class="project-image">
+                <p class="image-caption">LaneGCN architecture consisting of ActorNet, MapNet, FusionNet and prediction header modules</p>
+            </div>
+            <div class="procedure-section">
+                <p>The LaneGCN model processes two main types of inputs:</p>
+                <ul>
+                    <li><strong>Vector Map Data:</strong> Includes lane coordinates, grouping information, on-route status, and traffic light status</li>
+                    <li><strong>Agent Information:</strong> Contains status (x, y, heading) of ego and surrounding vehicles across 5 frames</li>
+                </ul>
+            </div>
+
+            <h3>Raster Model</h3>
+            <div class="procedure-section">
+                <p>The Raster model uses a ResNet50 backbone to process input information as raster layers:</p>
+                <ul>
+                    <li><strong>Input Layers:</strong>
+                        <ul>
+                            <li>Ego agent layer</li>
+                            <li>Surrounding agents layer</li>
+                            <li>Baseline path layer</li>
+                            <li>Roadmap layer</li>
+                        </ul>
+                    </li>
+                    <li><strong>Processing:</strong> Uses CNN architecture to capture local spatial relationships and features from the rasterized input</li>
+                    <li><strong>Output:</strong> Predicts trajectory coordinates and heading information</li>
+                </ul>
+            </div>
+
+            
+            
+            <h3>Vision Transformer (VIT) Model</h3>
+            <div class="image-section">
+                <img src="../assets/Trajectory Planning/nuplan/VIT.png" alt="Vision Transformer Architecture" class="project-image">
+                <p class="image-caption">The architecture of VIT</p>
+            </div>
+
+            <h3>Input and Output Processing</h3>
+            
+            <h4>Vision Transformer/Raster Model Input/Output</h4>
+            <div class="image-section">
+                <img src="../assets/Trajectory Planning/nuplan/VITIO2.png" alt="VIT Input/Output Processing" class="project-image">
+                <p class="image-caption">VIT/Raster Model model's input layers (ego agent, surrounding agents, baseline path, roadmap) and output trajectory representation</p>
+            </div>
+
+            <h4>LaneGCN Input/Output</h4>
+            <div class="image-section">
+                <img src="../assets/lanegcninputoutput.png" alt="LaneGCN Input/Output Processing" class="project-image">
+                <p class="image-caption">LaneGCN's input processing showing vector map data integration with agent trajectories</p>
+            </div>
+            
+            <div class="procedure-section">
+                <h4>Input Processing Comparison</h4>
+                <ul>
+                    <li><strong>Vision Transformer/Raster Model:</strong> Processes input as a 4-channel image with separate layers for ego vehicle, surrounding agents, baseline path, and road structure</li>
+                    <li><strong>LaneGCN:</strong> Processes structured vector data including:
+                        <ul>
+                            <li>Lane-level map information with connectivity</li>
+                            <li>Historical trajectories of agents</li>
+                            <li>Traffic rules and road topology</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>Output Format</h4>
+                <ul>
+                    <li>Both models predict:
+                        <ul>
+                            <li>Future trajectory coordinates (x, y)</li>
+                            <li>Vehicle heading angles</li>
+                            <li>Prediction horizon: 8 seconds</li>
+                            <li>Time resolution: 0.5 seconds</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>Simulation Results</h3>
+            
+            <div class="metrics-comparison">
+                <h4>Open-Loop and Closed-Loop Metrics</h4>
+                <div class="metrics-grid">
+                    <div>
+                        <h5>Open-Loop Metrics</h5>
+                        <div class="metrics-table-container">
+                            <table class="metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>ADE</th>
+                                        <th>AHE</th>
+                                        <th>FDE</th>
+                                        <th>FHE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>LaneGCN</td>
+                                        <td class="best-metric">4.817</td>
+                                        <td>0.1113</td>
+                                        <td class="best-metric">11.01</td>
+                                        <td>0.2158</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Raster</td>
+                                        <td>12.77</td>
+                                        <td class="best-metric">0.1009</td>
+                                        <td>24.53</td>
+                                        <td class="best-metric">0.1686</td>
+                                    </tr>
+                                    <tr>
+                                        <td>VIT</td>
+                                        <td>14.82</td>
+                                        <td>0.1921</td>
+                                        <td>27.64</td>
+                                        <td>0.3246</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="metrics-caption">Open-loop metrics comparison. ADE: Average Displacement Error, AHE: Average Heading Error, FDE: Final Displacement Error, FHE: Final Heading Error. Lower values are better.</p>
+                    </div>
+
+                    <div>
+                        <h5>Closed-Loop Metrics</h5>
+                        <div class="metrics-table-container">
+                            <table class="metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Drivable Area Compliance</th>
+                                        <th>Min Time to Collision</th>
+                                        <th>Ego Expert Progress Ratio</th>
+                                        <th>Ego is Comfortable</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>LaneGCN</td>
+                                        <td>0</td>
+                                        <td>0.2</td>
+                                        <td>0.471</td>
+                                        <td>0.25</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Raster</td>
+                                        <td class="best-metric">0.8</td>
+                                        <td class="best-metric">0.625</td>
+                                        <td>0.389</td>
+                                        <td class="best-metric">0.625</td>
+                                    </tr>
+                                    <tr>
+                                        <td>VIT</td>
+                                        <td>0.55</td>
+                                        <td>0.35</td>
+                                        <td class="best-metric">0.517</td>
+                                        <td>0.275</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="metrics-caption">Closed-loop metrics comparison. Higher values indicate better performance across all metrics.</p>
+                    </div>
+                </div>
+
+                <div class="metrics-analysis">
+                    <h4>Performance Analysis</h4>
+                    <ul>
+                        <li><strong>Open-Loop Performance:</strong>
+                            <ul>
+                                <li>LaneGCN shows superior performance in displacement metrics (ADE and FDE)</li>
+                                <li>Raster model excels in heading accuracy (AHE and FHE)</li>
+                                <li>VIT model shows room for improvement in open-loop scenarios</li>
+                            </ul>
+                        </li>
+                        <li><strong>Closed-Loop Performance:</strong>
+                            <ul>
+                                <li>Raster model demonstrates best overall performance with high scores in comfort and safety metrics</li>
+                                <li>VIT model shows improved performance compared to open-loop scenarios</li>
+                                <li>LaneGCN performs well in progress ratio but needs improvement in other aspects</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Scenario-Based Analysis</h4>
+            <div class="image-section">
+                <img src="../assets/Trajectory Planning/nuplan/Scenarios Comparison.png" alt="Scenarios Comparison" class="project-image">
+                <p class="image-caption">Scenarios Comparison across different driving conditions. Left: LaneGCN, Middle: Raster model, Right: Vision Transformer. Top: Going straight, Middle: Stopping, Bottom: Going straight through intersection</p>
+            </div>
+
+            <div class="scenario-analysis">
+                <p>The scenario comparison reveals:</p>
+                <ul>
+                    <li>All models perform well in basic straight driving scenarios</li>
+                    <li>LaneGCN shows superior performance in stopping scenarios, followed by the Raster model</li>
+                    <li>In intersection scenarios, while all models show room for improvement, LaneGCN and Raster models better capture scenario boundary information</li>
+                </ul>
+            </div>
+
+            
+
+            <div class="references-section">
+                <h2>References</h2>
+                <ol class="reference-list">
+                    <li>Caesar, H., Kabzan, J., Tan, K. S., Fong, W. K., Wolff, E., Lang, A., Fletcher, L., Beijbom, O., & Omari, S. (2021). NuPlan: A closed-loop ML-based planning benchmark for autonomous vehicles.</li>
+                    <li>Liang, M., Yang, B., Hu, R., Chen, Y., Liao, R., Feng, S., & Urtasun, R. (2020). Learning Lane Graph Representations for Motion Forecasting.</li>
+                    <li>He, K., Zhang, X., Ren, S., & Sun, J. (2015). Deep Residual Learning for Image Recognition.</li>
+                    <li>Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., & Houlsby, N. (2020). An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="../index.html#projects" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </footer>
+</body>
+</html>

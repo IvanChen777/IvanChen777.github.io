@@ -1,0 +1,7 @@
+@inproceedings{tan2019efficientnet,
+  title={Efficientnet: Rethinking model scaling for convolutional neural networks},
+  author={M. {Tan} and Q. V. {Le}},
+  booktitle={Proc. Int. Conf. Mach. Learn. (ICML)},
+  pages={6105--6114},
+  year={2019},
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Following System - Project Details</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Real-time Person Following Robot System</h1>
+            </div>
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span class="metadata-label"></span>
+                    <span>EPFL CIVIL-459 DLAV</span>
+                </div>
+                <div class="metadata-item">
+                    
+                    <span></span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label"></span>
+                    <span>Spring 2023</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-content">
+            <div class="project-summary">
+                <h2>Project Overview</h2>
+                <p>This project develops a robust person-following system for the Loomo robot platform, combining state-of-the-art object detection and tracking algorithms. The system is designed to maintain reliable tracking even in challenging conditions, such as when the target is occluded or temporarily out of frame. The implementation achieved exceptional results in the Tandem race competition, obtaining the second place in the time trial with 49.58 seconds, and securing first place overall.</p>
+                
+                <div class="project-highlights">
+                    <h3>Key Achievements</h3>
+                    <ul>
+                        <li>Real-time detection and tracking using YOLOv5 and Deep SORT</li>
+                        <li>Robust performance across diverse environments</li>
+                        <li>High detection confidence (>0.9) with minimal false positives</li>
+                        <li>Smooth tracking through occlusions and frame exits</li>
+                        <li>First Prize in the final competition</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="detection-section">
+                <h2>Detection System</h2>
+                <h3>YOLOv5 Architecture</h3>
+                <p>We chose YOLOv5 as our object detection algorithm for its optimal balance of speed and accuracy. The architecture consists of three main components:</p>
+                
+                <div class="yolo-architecture">
+                    <div class="architecture-diagram">
+                        <div class="diagram-component backbone">
+                            <h5>Backbone</h5>
+                            <div class="subcomponents">
+                                <div>CSPNet</div>
+                                <div>SPP</div>
+                            </div>
+                            <div class="arrow">→</div>
+                        </div>
+                        <div class="diagram-component neck">
+                            <h5>Neck</h5>
+                            <div class="subcomponents">
+                                <div>FPN ↓</div>
+                                <div>PAN ↑</div>
+                            </div>
+                            <div class="arrow">→</div>
+                        </div>
+                        <div class="diagram-component head">
+                            <h5>Head</h5>
+                            <div class="subcomponents">
+                                <div>Prediction</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="image-caption">Figure 1: The architecture of YOLOv5 showing the data flow through backbone, neck, and head components.</p>
+                </div>
+
+                <div class="architecture-details">
+                    <div class="component-section">
+                        <h4>1. Backbone</h4>
+                        <p>Based on two key components:</p>
+                        <ul>
+                            <li><strong>Cross Stage Partial Network (CSPNet)</strong></li>
+                            <li><strong>Spatial Pyramid Pooling (SPP)</strong></li>
+                        </ul>
+                        <p>These components work together to extract feature maps of different sizes through multiple convolutional and pooling layers.</p>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>2. Neck</h4>
+                        <p>Consists of two complementary networks:</p>
+                        <ul>
+                            <li><strong>Feature Pyramid Network (FPN):</strong> Conveys semantic features from higher feature maps to lower feature maps</li>
+                            <li><strong>Pixel Aggregation Network (PAN):</strong> Conveys localization features from lower feature maps to higher feature maps</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-section">
+                        <h4>3. Head</h4>
+                        <p>Specialized component used to predict targets of different sizes on feature maps. We specifically used YOLOv5s, the smallest and fastest variant of the model family, which proved ideal for our real-time detection needs.</p>
+                    </div>
+                </div>
+                
+                <div class="dataset-section">
+                    <h3>Dataset Creation</h3>
+                    <p>The dataset contains 1166 images collected across diverse environments, with careful consideration of different lighting conditions, angles, distances, and occlusions. The dataset was split into:</p>
+                    <ul>
+                        <li>Training: 816 images (2448 after augmentation)</li>
+                        <li>Validation: 225 images</li>
+                        <li>Testing: 125 images</li>
+                    </ul>
+                    
+                    <div class="image-grid four-column">
+                        <div class="image-section">
+                            <img src="../assets/DLAV_proj/Image/bob9.jpg" alt="Campus Detection" class="project-image">
+                            <p class="image-caption">(a) On campus detection</p>
+                        </div>
+                        <div class="image-section">
+                            <img src="../assets/DLAV_proj/Image/bob8.jpg" alt="Street Detection" class="project-image">
+                            <p class="image-caption">(b) Street environment</p>
+                        </div>
+                        <div class="image-section">
+                            <img src="../assets/DLAV_proj/Image/bob7.jpg" alt="Park Detection" class="project-image">
+                            <p class="image-caption">(c) Park environment</p>
+                        </div>
+                        <div class="image-section">
+                            <img src="../assets/DLAV_proj/Image/bob10.jpg" alt="Indoor Detection" class="project-image">
+                            <p class="image-caption">(d) Indoor environment</p>
+                        </div>
+                    </div>
+                    <p class="dataset-note">Figure 2: Detection results from testing dataset showing robustness across different environments</p>
+                </div>
+
+                
+            </div>
+
+            <div class="tracking-section">
+                <h2>Tracking System</h2>
+                <h3>Deep SORT Architecture</h3>
+                <p>For real-time tracking of the person of interest, we implemented the Deep SORT (Simple Online and Realtime Tracking with a Deep Association Metric) algorithm, chosen for its exceptional robustness in handling occlusions and viewpoint changes.</p>
+                
+                <div class="deepsort-architecture">
+                    <div class="architecture-diagram">
+                        <div class="diagram-component detection">
+                            <h5>Detection</h5>
+                            <div class="subcomponents">
+                                <div>YOLOv5</div>
+                                <div>Bounding Boxes</div>
+                            </div>
+                            <div class="arrow">→</div>
+                        </div>
+                        <div class="diagram-component tracking">
+                            <h5>Tracking</h5>
+                            <div class="subcomponents">
+                                <div>Kalman Filter</div>
+                                <div>Hungarian Algorithm</div>
+                            </div>
+                            <div class="arrow">→</div>
+                        </div>
+                        <div class="diagram-component association">
+                            <h5>Association</h5>
+                            <div class="subcomponents">
+                                <div>Deep Metric</div>
+                                <div>CNN Features</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="image-caption">Figure 3: The architecture of Deep SORT showing the integration of detection, tracking, and deep association components.</p>
+                </div>
+
+                <div class="implementation-details">
+                    
+
+                    <h4>Initialization and Tracking Process</h4>
+                    <ol>
+                        <ul>
+                        <li>Initial detection of the target hat</li>
+                        <li>Person detection using bounding box intersection with the hat</li>
+                        <li>Continuous tracking after hat removal</li>
+                        </ul>
+                    </ol>
+
+                    <h4>Robustness Features</h4>
+                    <ul>
+                        <li>Frame exit handling with immediate reacquisition</li>
+                        <li>5-frame buffer for temporary detection loss</li>
+                        <li>Zero linear constant Kalman filter simulation for smooth tracking</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>Competition Results</h2>
+                <div class="competition-results">
+                    <h3>Tandem Race Performance</h3>
+                    <ul>
+                        <li><strong>Time Trial:</strong> 49.58 seconds (2nd Place)</li>
+                        <li><strong>Final Competition:</strong> First Prize Winner</li>
+                        <li><strong>Key Success Factors:</strong>
+                            <ul>
+                                <li>Robust dataset creation and training</li>
+                                <li>Optimized algorithm selection</li>
+                                <li>Effective robot guidance strategy</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+               
+
+            <div class="references-section">
+                <h2>References</h2>
+                <ol class="reference-list">
+                    <li>YOLOv5 Documentation and Implementation Guide</li>
+                    <li>Wojke, N., Bewley, A., & Paulus, D. (2017). Simple Online and Realtime Tracking with a Deep Association Metric</li>
+                </ol>
+            </div>
+
+            <div class="github-section">
+                <h2>Source Code</h2>
+                <div class="github-link">
+                    <a href="https://github.com/IvanChen777/Robots-programmed-to-follow-you" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-github"></i>
+                        <span>Robots Programmed to Follow You</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="../index.html#projects" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </footer>
+</body>
+</html>

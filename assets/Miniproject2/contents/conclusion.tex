@@ -1,0 +1,5 @@
+\section{Conclusion}
+During our process for this mini-project, we understand each module in the proposed framework and also understand the choice for each parameter as well as hyper parameter. However, we also met 2 problems during the process of building our own structure:
+
+1. A mistake we made when implementing parameter updating is that we make the gradients inside the modules reference a new object everytime we do backwarding so that the gradients in \textbf{SGD} instance and those in the modules don't reference the same objects. Then we realized that we should do inplace operation on the gradients inside the modules (here we use \textbf{add} operation) and the gradients should be reset to zero every time before calling backward.
+2. For writing the upsampling module, at first we use 4 for loops to finish the forward as well as backward function, which is not efficient. Then we apply repeat interleave as well as unfold methods, which increases our training speed significantly.

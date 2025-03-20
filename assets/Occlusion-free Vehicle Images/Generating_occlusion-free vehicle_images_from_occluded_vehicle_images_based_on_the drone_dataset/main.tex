@@ -1,0 +1,42 @@
+\documentclass[10pt,journal,a4paper]{IEEEtran}
+% \includegraphics
+\input{preamble}
+\usepackage{balance}
+\begin{document}
+%
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+\title{Generating Occlusion-free Vehicle Images From Occluded Vehicle Images Based on the Drone Dataset}
+%
+% 
+\author{Student: Yifeng Chen, Supervisor: Yura Tak, Robert Fonod, Professor: Nikolas Geroliminis 
+
+
+\textit{\'Ecole Polytechnique F\'ed\'erale de Lausanne, Switzerland}}
+
+\IEEEcompsoctitleabstractindextext{
+\begin{abstract}
+Occluded vehicles, as a common phenomenon in the drone dataset, have a negative impact on traffic monitoring in Unmanned Aerial Systems. Due to the lack of occluded-free and occluded pair vehicle datasets, few researchers focus on solving the vehicle occlusion removal problem. Nevertheless, several types of research focus on solving the occluded faces problems and achieving significant results. To this end, we build our own occluded vehicle dataset on this project. Besides, inspired by the occluded faces removing problem, we propose an updated context encoder – a convolutional neural network trained to generate the contents of an arbitrary image region conditioned on its surroundings.  Compared to the original context encoder, which could reconstruct the image based on a fixed-size binary mask in a fixed location, our updated context encoder could reconstruct the image based on a flexible fixed-size mask with a random location. Sharper results could be obtained by implementing the pixel-wise reconstruction loss and an adversarial loss. We create an occluded vehicle dataset from the Pully dataset and several occlusions. We evaluate the performance of the pre-trained context encoder on the occluded vehicle image dataset, including tree and shadow. The experimental results demonstrate that our work can effectively reconstruct the vehicle image.
+\end{abstract}
+}
+
+% make the title area
+\maketitle
+\IEEEdisplaynotcompsoctitleabstractindextext
+
+
+\input{contents/introduction}
+\input{contents/method}
+\input{contents/result}
+\input{contents/conclusion}
+
+\section*{Acknowledge}
+The author thanks the supervisors Yura Tak and Robert Fonod for the detailed instructions during this semester, as well as the kind support from our prof. Nikolas Geroliminis.
+
+\bibliographystyle{IEEEtran}
+
+\bibliography{ref}
+
+\end{document}
+
+
