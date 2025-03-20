@@ -6,6 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Clear-Site-Data" content="cache">
     <title>Personal Portfolio</title>
     <link rel="stylesheet" href="styles.css?v=20250320">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -279,6 +280,13 @@
         <p>&copy; 2025 Personal Portfolio. All rights reserved.</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20250320"></script>
+    <script>
+        // Register service worker for cache control
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js?v=20250320')
+                .then(function() { console.log('Service Worker Registered'); });
+        }
+    </script>
 </body>
 </html>
