@@ -16,14 +16,14 @@
 }
 
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
 }
 
 body {
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
-    line-height: 1.7;
+    line-height: 1.6;
     color: var(--text-color);
-    font-size: 17px;
+    font-size: 15px;
 }
 
 /* Navigation */
@@ -54,8 +54,8 @@ nav a {
     text-decoration: none;
     color: #4a4a4a;
     font-weight: 600;
-    transition: all 0.3s;
-    font-size: 1.1rem;
+    transition: none;
+    font-size: 1rem;
     position: relative;
 }
 
@@ -63,20 +63,9 @@ nav a:hover {
     color: #2c3e50;
 }
 
-nav a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 50%;
-    background-color: #2c3e50;
-    transition: all 0.3s;
-    transform: translateX(-50%);
-}
-
-nav a:hover::after {
-    width: 100%;
+nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }
 
 /* Hero Section */
@@ -116,8 +105,8 @@ nav a:hover::after {
 .hero-content h1 {
     color: #2c3e50;
     font-weight: 700;
-    margin-bottom: 2rem;
-    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 2.8rem;
     line-height: 1.1;
     letter-spacing: -0.5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
@@ -125,7 +114,7 @@ nav a:hover::after {
 
 .hero-content p {
     color: #2c3e50;
-    font-size: 1.7rem;
+    font-size: 1.4rem;
     font-weight: 500;
     line-height: 1.2;
     margin: 0 auto;
@@ -160,8 +149,8 @@ nav a:hover::after {
 .section h2 {
     text-align: center;
     color: var(--academic-blue);
-    margin-bottom: 3rem;
-    font-size: 2.7rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
@@ -330,12 +319,9 @@ nav a:hover::after {
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    transition: transform 0.3s ease;
 }
 
-.experience-content:hover {
-    transform: translateX(5px);
-}
+/* Removed hover animation */
 
 .experience-header {
     margin-bottom: 1.5rem;
@@ -386,7 +372,6 @@ nav a:hover::after {
     display: block;
     object-fit: cover;
     border: none;
-    transition: transform 0.3s ease;
     object-position: 40% center;
     margin-left: -120%;
 }
@@ -402,9 +387,7 @@ nav a:hover::after {
     pointer-events: none;
 }
 
-.profile-image:hover img {
-    transform: scale(1.02);
-}
+/* Removed hover animation */
 
 .about-text {
     flex: 2;
@@ -467,7 +450,6 @@ nav a:hover::after {
     width: 100%;
     height: auto;
     display: block;
-    transition: transform 0.3s ease;
     background: white;
     padding: 0;
     mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 70%, transparent 100%);
@@ -485,9 +467,7 @@ nav a:hover::after {
     pointer-events: none;
 }
 
-.university-logo:hover img {
-    transform: scale(1.05);
-}
+/* Removed hover animation */
 
 /* Experience Grid */
 .experience-grid, .projects-grid {
@@ -503,12 +483,9 @@ nav a:hover::after {
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
 }
 
-.experience-item:hover, .project-item:hover {
-    transform: translateY(-5px);
-}
+/* Removed hover animation */
 
 .experience-item img, .project-item img {
     width: 100%;
@@ -578,17 +555,13 @@ nav a:hover::after {
     text-decoration: none;
     color: inherit;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     gap: 16px;
     border-left: 4px solid var(--academic-blue);
 }
 
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
+/* Removed hover animation */
 
 .project-card h3 {
     color: var(--academic-blue);
@@ -727,8 +700,8 @@ nav a:hover::after {
 
 .procedure-section p {
     font-weight: 500;
-    margin-bottom: 1.5rem;
-    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
     color: #2c3e50;
 }
 
@@ -738,23 +711,23 @@ nav a:hover::after {
 }
 
 .procedure-section li {
-    margin-bottom: 1rem;
-    line-height: 1.8;
-    font-size: 1.15rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+    font-size: 1rem;
     color: #2c3e50;
 }
 
 .project-content h2 {
     color: var(--primary-color);
-    margin: 2.5rem 0 1.5rem;
-    font-size: 2rem;
+    margin: 2rem 0 1.2rem;
+    font-size: 1.7rem;
     font-weight: 700;
 }
 
 .project-content h3 {
     color: var(--primary-color);
-    margin: 2rem 0 1.2rem;
-    font-size: 1.6rem;
+    margin: 1.5rem 0 1rem;
+    font-size: 1.4rem;
     font-weight: 700;
 }
 
@@ -778,7 +751,6 @@ nav a:hover::after {
 .nav-icon {
     font-size: 1.5rem;
     color: var(--primary-color);
-    transition: color 0.3s ease;
 }
 
 .nav-icon:hover {
@@ -821,12 +793,9 @@ nav a:hover::after {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
 }
 
-.interest-item:hover {
-    transform: translateY(-5px);
-}
+/* Removed hover animation */
 
 .interest-item i, .interest-item .custom-icon {
     font-size: 2rem;
