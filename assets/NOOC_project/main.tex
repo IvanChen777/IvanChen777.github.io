@@ -1,0 +1,38 @@
+\documentclass[10pt,journal,a4paper]{IEEEtran}
+% \includegraphics
+\input{preamble}
+
+\begin{document}
+%
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+\title{Percolation and Urban Traffic Dynamics}
+%
+% 
+\author{Yifeng Chen, Chun-Tso Tsai}
+
+\IEEEcompsoctitleabstractindextext{
+\begin{abstract}
+Analysis of an urban traffic network has always been a non-trivial task for city planners and engineers due to its high complexity in real life. By utilizing a functional construction method, we interpret traffic data into an abstract graph. Percolation theory applied on the network allow us to analyze the critical phenomenon of urban traffic dynamics. We found that the critical percolation exponent determines the type of the network, which switches between a grid-like topology and a small-world model. The system bottleneck can also be identified by the percolation analysis. With the tools provided in this work, it would be helpful to analyze and to improve urban traffic networks for civil engineers. 
+\end{abstract}
+}
+
+% make the title area
+\maketitle
+\IEEEdisplaynotcompsoctitleabstractindextext
+
+
+\input{contents/introduction}
+\input{contents/method}
+\input{contents/result}
+\input{contents/conclusion}
+
+\section*{Acknowledge}
+The authors thank Prof. Matthias Grossglauser and Prof. Patrick Thiran for the detailed instructions during the lecture, as well as the kind support from our assistant Loïs Huguenin-Dumittan.
+
+\bibliographystyle{IEEEtran}
+\bibliography{ref}
+
+\end{document}
+
+
