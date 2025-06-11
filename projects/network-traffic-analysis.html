@@ -79,18 +79,20 @@
                 <h3>2.2 Critical Threshold q<sub>c</sub></h3>
                 <p>We construct a functional network of the traffic dynamics from the original topology for any given q. If q=0, every road section meets demand, and the functioning traffic network is identical to the previous network. On the other hand, if q=1, since almost all the links are removed from the original network, the functional network becomes completely fragmented. The functional traffic network becomes diluted as q grows from 0 to 1, which is known as "traffic percolation". q<sub>c</sub>(t) is the crucial threshold value of q in traffic percolation, where the huge component of the dynamical network breaks down into fragmented local traffic clusters and the second biggest cluster reaches its maximum size.</p>
                 
-                <h3>2.3 Reachable Areas Analysis</h3>
-                <p>To verify the fidelity of our network model, we analyze the reachable areas from specific starting points during different time periods. This helps visualize how congestion affects connectivity in the network.</p>
+                <h3>2.3 Network Model Representation</h3>
+                <p>To verify the fidelity of our network model, we observe the reachable area within a specific time from different starting points. We select three points from the three main connected components presented in the network at q=0.09, and test the reachable area during busy period and normal period.</p>
+                
+                <p>As shown in the figures below, the reachable area changes significantly between both scenarios, and this division of areas conceptually represents the different connected components in the constructed network. The color coding indicates travel time: green roads are reachable within 1 minute, blue within 2 minutes, orange within 3 minutes, and red taking more than 4 minutes. The starting point is marked as a red spot in the green area.</p>
                 
                 <div class="image-section">
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/reachable/first_normal_1.png" alt="Starting point 1, normal period" class="project-image">
-                            <p class="image-caption">Figure 2a: Starting point 1, normal period</p>
+                            <p class="image-caption">Figure 2a: Reachable area from starting point 1 during normal period</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/reachable/first_busy_1.png" alt="Starting point 1, busy period" class="project-image">
-                            <p class="image-caption">Figure 2b: Starting point 1, busy period</p>
+                            <p class="image-caption">Figure 2b: Reachable area from starting point 1 during busy period</p>
                         </div>
                     </div>
                 </div>
@@ -99,14 +101,29 @@
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/reachable/second_normal_1.png" alt="Starting point 2, normal period" class="project-image">
-                            <p class="image-caption">Figure 3a: Starting point 2, normal period</p>
+                            <p class="image-caption">Figure 3a: Reachable area from starting point 2 during normal period</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/reachable/second_busy_1.png" alt="Starting point 2, busy period" class="project-image">
-                            <p class="image-caption">Figure 3b: Starting point 2, busy period</p>
+                            <p class="image-caption">Figure 3b: Reachable area from starting point 2 during busy period</p>
                         </div>
                     </div>
                 </div>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/reachable/third_normal_1.png" alt="Starting point 3, normal period" class="project-image">
+                            <p class="image-caption">Figure 3c: Reachable area from starting point 3 during normal period</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/reachable/third_busy_1.png" alt="Starting point 3, busy period" class="project-image">
+                            <p class="image-caption">Figure 3d: Reachable area from starting point 3 during busy period</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>This analysis demonstrates that congestion in certain roads can indeed lead to division of the network in terms of traversable areas, which supports our percolation-based approach to traffic network analysis.</p>
             </div>
 
             <div class="section">
