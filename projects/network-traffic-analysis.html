@@ -112,39 +112,61 @@
             <div class="section">
                 <h2>3. Results</h2>
                 
-                <h3>3.1 Critical Threshold Analysis</h3>
-                <p>By analyzing the network at different threshold values, we identified the critical threshold where the giant component breaks down. This critical point reveals important information about the network's robustness and structure.</p>
+                <h3>3.1 Analysis of Network Percolation with Different q Values</h3>
+                <p>Based on the network constructing method illustrated in the previous part, a functional traffic network which related to the choice of q is built. To understand the relationship between q and the efficiency of the road network, we modify the value of q and investigate the construction process of the dynamical traffic network to observe the emergence of global city traffic in the network scale at a particular moment.</p>
+                
+                <p>We choose a moment when the road network is congested and analyze three different q values. At first, for q=0.69, only small clusters of connected high-speed roadways show up, which is unable to support global network traffic. As the value of q decreases to 0.07, these small clusters combine together and a giant cluster appears, where the functional network (with lower velocity) extends to almost the full scale of original road network. According to percolation theory, the size of the second-largest cluster becomes greatest at q=0.09, indicating the phase transition point for network connection of a functioning traffic network.</p>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/069.png" alt="q=0.69" class="project-image">
+                            <p class="image-caption">Figure 4a: Non-congested connections with q=0.69</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/009.png" alt="q=0.09" class="project-image">
+                            <p class="image-caption">Figure 4b: Non-congested connections with q=0.09</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/007.png" alt="q=0.07" class="project-image">
+                            <p class="image-caption">Figure 4c: Non-congested connections with q=0.07</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>3.2 Critical Threshold Analysis</h3>
+                <p>To understand the percolation-like process better, we analyze the relationship between q and the size of largest and second largest component. The size of the giant component diminishes as q grows, and the second-largest cluster achieves a maximum at the critical threshold (q<sub>c</sub>), which separates the fragmented and linked phases of the traffic network.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/G and SG.png" alt="Component Size Analysis" class="project-image">
-                    <p class="image-caption">Figure 4: Giant component (G) and second-largest component (SG) size analysis during percolation.</p>
+                    <p class="image-caption">Figure 5: Giant component (G) and second-largest component (SG) size analysis during percolation.</p>
                 </div>
                 
-                <h3>3.2 Temporal Variation in Network Properties</h3>
+                <h3>3.3 Temporal Variation in Network Properties</h3>
                 <p>The critical threshold varies throughout the day, providing insights into traffic patterns and congestion dynamics. We observed distinct differences between normal periods and rush hours.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/qc-t.png" alt="Critical Threshold Analysis" class="project-image">
-                    <p class="image-caption">Figure 5: Analysis of critical threshold over time periods.</p>
+                    <p class="image-caption">Figure 6: Analysis of critical threshold over time periods.</p>
                 </div>
                 
-                <h3>3.3 Power Law Analysis</h3>
+                <h3>3.4 Power Law Analysis</h3>
                 <p>We analyzed the scaling behavior of the network components near the critical threshold. The critical exponent τ provides information about the network type, distinguishing between grid-like structures and small-world networks.</p>
                 
                 <div class="image-section">
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/tau_qc_base2.png" alt="Critical Exponent Analysis" class="project-image">
-                            <p class="image-caption">Figure 6: Critical exponent analysis for directed network.</p>
+                            <p class="image-caption">Figure 7a: Critical exponent analysis for directed network.</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/tau_qc_undir_base2.png" alt="Undirected Critical Exponent" class="project-image">
-                            <p class="image-caption">Figure 7: Critical exponent analysis for undirected network.</p>
+                            <p class="image-caption">Figure 7b: Critical exponent analysis for undirected network.</p>
                         </div>
                     </div>
                 </div>
                 
-                <h3>3.4 Bottleneck Analysis</h3>
+                <h3>3.5 Bottleneck Analysis</h3>
                 <p>Based on previous research, the network at percolation criticality acts as the original network's "backbone." There are specific links that have a significant effect for bridging different functional clusters of traffic. These links can be considered as bottlenecks, whose speed are the lowest among the links in the backbone.</p>
                 
                 <p>Since road network is a directed graph, we define the component as strongly connected component, in which all pairs of nodes are mutually accessible from each other along a directed path. Therefore, if the bottleneck is removed, the giant component will disintegrate into different clusters.</p>
