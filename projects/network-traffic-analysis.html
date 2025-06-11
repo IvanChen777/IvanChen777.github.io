@@ -79,15 +79,31 @@
                 <h3>2.2 Critical Threshold q<sub>c</sub></h3>
                 <p>We construct a functional network of the traffic dynamics from the original topology for any given q. If q=0, every road section meets demand, and the functioning traffic network is identical to the previous network. On the other hand, if q=1, since almost all the links are removed from the original network, the functional network becomes completely fragmented. The functional traffic network becomes diluted as q grows from 0 to 1, which is known as "traffic percolation". q<sub>c</sub>(t) is the crucial threshold value of q in traffic percolation, where the huge component of the dynamical network breaks down into fragmented local traffic clusters and the second biggest cluster reaches its maximum size.</p>
                 
+                <h3>2.3 Reachable Areas Analysis</h3>
+                <p>To verify the fidelity of our network model, we analyze the reachable areas from specific starting points during different time periods. This helps visualize how congestion affects connectivity in the network.</p>
+                
                 <div class="image-section">
                     <div class="image-grid">
                         <div>
-                            <img src="../assets/NOOC_project/images/before.png" alt="Before Congestion" class="project-image">
-                            <p class="image-caption">Figure 2: Network before reaching critical threshold.</p>
+                            <img src="../assets/NOOC_project/images/reachable/first_normal_1.png" alt="Starting point 1, normal period" class="project-image">
+                            <p class="image-caption">Figure 2a: Starting point 1, normal period</p>
                         </div>
                         <div>
-                            <img src="../assets/NOOC_project/images/after.png" alt="After Congestion" class="project-image">
-                            <p class="image-caption">Figure 3: Network after reaching critical threshold.</p>
+                            <img src="../assets/NOOC_project/images/reachable/first_busy_1.png" alt="Starting point 1, busy period" class="project-image">
+                            <p class="image-caption">Figure 2b: Starting point 1, busy period</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/reachable/second_normal_1.png" alt="Starting point 2, normal period" class="project-image">
+                            <p class="image-caption">Figure 3a: Starting point 2, normal period</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/reachable/second_busy_1.png" alt="Starting point 2, busy period" class="project-image">
+                            <p class="image-caption">Figure 3b: Starting point 2, busy period</p>
                         </div>
                     </div>
                 </div>
@@ -128,12 +144,29 @@
                     </div>
                 </div>
                 
-                <h3>3.4 Bottleneck Identification</h3>
-                <p>The percolation analysis allowed us to identify critical bottlenecks in the traffic network. These are key areas where congestion has the most significant impact on overall network connectivity.</p>
+                <h3>3.4 Bottleneck Analysis</h3>
+                <p>Based on previous research, the network at percolation criticality acts as the original network's "backbone." There are specific links that have a significant effect for bridging different functional clusters of traffic. These links can be considered as bottlenecks, whose speed are the lowest among the links in the backbone.</p>
+                
+                <p>Since road network is a directed graph, we define the component as strongly connected component, in which all pairs of nodes are mutually accessible from each other along a directed path. Therefore, if the bottleneck is removed, the giant component will disintegrate into different clusters.</p>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/after.png" alt="Before removing bottleneck" class="project-image">
+                            <p class="image-caption">Figure 8a: 5 largest components distribution before removing the bottleneck (q<sub>c</sub>=0.1)</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/before.png" alt="After removing bottleneck" class="project-image">
+                            <p class="image-caption">Figure 8b: 5 largest components distribution after removing the bottleneck (q<sub>c</sub>=0.09)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>Besides, the bottleneck link could also have an impact on the global traffic. If the speed of bottleneck is increased (r<sub>ij</sub>' = r<sub>ij</sub>(1+α)), then q<sub>c</sub> of the traffic network is significantly increased. However, if we increase the link speed randomly, there is no such effect for the global network.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/linear_fit.png" alt="Linear Fit Analysis" class="project-image">
-                    <p class="image-caption">Figure 8: Linear fit analysis of network performance metrics.</p>
+                    <p class="image-caption">Figure 9: Percolation cluster power law analysis (slope=-2.07)</p>
                 </div>
             </div>
 
