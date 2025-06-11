@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Network Organization and Congestion Analysis</title>
+    <link rel="stylesheet" href="../styles.css?v=20250611">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="../index.html">Home</a>
+        </div>
+    </nav>
+
+    <div class="project-detail">
+        <header class="project-header">
+            <h1>Network Organization and Congestion Analysis of Traffic Networks</h1>
+            <div class="project-metadata">
+                <div class="metadata-item">
+                    <h3>Location</h3>
+                    <p>Barcelona, Spain</p>
+                </div>
+                <div class="metadata-item">
+                    <h3>Period</h3>
+                    <p>2024</p>
+                </div>
+                <div class="metadata-item">
+                    <h3>Category</h3>
+                    <p>Network Analysis, Traffic Engineering</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="project-content">
+            <section>
+                <h2>Project Overview</h2>
+                <p>This project investigates urban traffic networks through the lens of graph theory and percolation analysis. By examining how traffic congestion affects network connectivity, we provide insights into the macroscopic characteristics of urban mobility systems.</p>
+                
+                <p>The research focuses on analyzing "how much a network suffers from congestion" — measuring how efficiently drivers can travel through a network while avoiding congested areas. We utilize network percolation concepts to evaluate traffic network functionality, examining how rising traffic demand leads to congestion that disconnects sections of the network.</p>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/Map of studied area.png" alt="Barcelona Study Area" class="project-image">
+                    <p class="image-caption">Figure 1: Map of the studied area in Barcelona, Spain.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>Methodology</h2>
+                <p>Our approach constructs a functional traffic network based on percolation theory. Rather than focusing solely on structural topology, we consider roads as functionally linked only when their speed exceeds a specified threshold.</p>
+                
+                <h3>Functional Network Construction</h3>
+                <p>Roads are classified into distinct states based on their speed. A road is considered functional only if its velocity meets a given demand threshold q ∈ [0,1]. We normalize measured speed data against a standard maximal value to obtain relative speeds, then compare these with the threshold to determine functionality.</p>
+                
+                <h3>Critical Threshold Analysis</h3>
+                <p>As the threshold q increases from 0 to 1, the functional network becomes increasingly fragmented (traffic percolation). We identify q<sub>c</sub>(t) as the critical threshold where the giant component breaks down into disconnected local traffic clusters.</p>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/before.png" alt="Before Congestion" class="project-image">
+                            <p class="image-caption">Figure 2: Network before congestion threshold.</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/after.png" alt="After Congestion" class="project-image">
+                            <p class="image-caption">Figure 3: Network after congestion threshold.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Key Findings</h2>
+                <p>Our analysis reveals important patterns in traffic network behavior:</p>
+                
+                <ul>
+                    <li>The critical threshold q<sub>c</sub> indicates network robustness against congestion</li>
+                    <li>The critical percolation exponent τ captures the network topology type</li>
+                    <li>Connectivity analysis identifies bottlenecks that significantly impact traffic flow</li>
+                    <li>Different time periods (normal hours vs. rush hours) show distinct percolation patterns</li>
+                </ul>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/qc-t.png" alt="Critical Threshold Analysis" class="project-image">
+                    <p class="image-caption">Figure 4: Analysis of critical threshold over time.</p>
+                </div>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/G and SG.png" alt="Component Size Analysis" class="project-image">
+                    <p class="image-caption">Figure 5: Giant component and second-largest component size analysis during percolation.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>We have demonstrated a series of tools for traffic network analysis. The metrics presented indicate different characteristics of a traffic network:</p>
+                <ul>
+                    <li>The critical threshold q<sub>c</sub> indicates network robustness</li>
+                    <li>The critical percolation exponent τ captures network type</li>
+                    <li>Connectivity analysis reveals congestion formation mechanisms</li>
+                </ul>
+                <p>Our findings provide deeper understanding of congestion formation and dissipation mechanisms. Future work will focus on controlling bottleneck traffic to mitigate city traffic congestion.</p>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/linear_fit.png" alt="Linear Fit Analysis" class="project-image">
+                    <p class="image-caption">Figure 6: Linear fit analysis of network performance metrics.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../script.js?v=20250611"></script>
+</body>
+</html>
