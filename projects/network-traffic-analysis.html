@@ -150,18 +150,27 @@
                     <p class="image-caption">Figure 6: Analysis of critical threshold over time periods.</p>
                 </div>
                 
-                <h3>3.4 Power Law Analysis</h3>
-                <p>We analyzed the scaling behavior of the network components near the critical threshold. The critical exponent τ provides information about the network type, distinguishing between grid-like structures and small-world networks.</p>
+                <h3>3.4 Critical Percolation Exponent</h3>
+                <p>We test the critical percolation exponent τ based on our network construction model. As suggested in previous research, we select q=q<sub>c</sub> as the threshold and count the connected components from the inferred graph. First, we demonstrate an example to show the exponential relationship between n<sub>s</sub> and s, where n<sub>s</sub> is the number of clusters of size s.</p>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/linear_fit.png" alt="Percolation Cluster Power Law" class="project-image">
+                    <p class="image-caption">Figure 7: Percolation cluster power law analysis (slope=-2.07)</p>
+                </div>
+                
+                <p>We calculate the evolution of τ as time progresses. Although the τ value should theoretically range between 2.05 and 2.5 according to percolation theory, we observe that many data points deviate from these theoretical values. This is likely because our network size is not large enough, and the network is not exactly grid-like. Additionally, the theoretical results are derived from undirected graphs, while our road hierarchy involves multiple one-way paths.</p>
+                
+                <p>To verify this claim, we construct another network assuming all roads are two-way roads. We can see the value is more centered around 2.05 to 2.5 in the undirected network than in the directed one. Nevertheless, we can still observe the trend that with higher τ values, the connectivity of the network is better by examining its relationship with q<sub>c</sub>. Since τ is positively related to q<sub>c</sub>, higher values indicate a more resilient network towards heavy traffic.</p>
                 
                 <div class="image-section">
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/tau_qc_base2.png" alt="Critical Exponent Analysis" class="project-image">
-                            <p class="image-caption">Figure 7a: Critical exponent analysis for directed network.</p>
+                            <p class="image-caption">Figure 8a: τ(t) with directed network</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/tau_qc_undir_base2.png" alt="Undirected Critical Exponent" class="project-image">
-                            <p class="image-caption">Figure 7b: Critical exponent analysis for undirected network.</p>
+                            <p class="image-caption">Figure 8b: τ(t) with undirected network</p>
                         </div>
                     </div>
                 </div>
@@ -175,21 +184,16 @@
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/after.png" alt="Before removing bottleneck" class="project-image">
-                            <p class="image-caption">Figure 8a: 5 largest components distribution before removing the bottleneck (q<sub>c</sub>=0.1)</p>
+                            <p class="image-caption">Figure 9a: 5 largest components distribution before removing the bottleneck (q<sub>c</sub>=0.1)</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/before.png" alt="After removing bottleneck" class="project-image">
-                            <p class="image-caption">Figure 8b: 5 largest components distribution after removing the bottleneck (q<sub>c</sub>=0.09)</p>
+                            <p class="image-caption">Figure 9b: 5 largest components distribution after removing the bottleneck (q<sub>c</sub>=0.09)</p>
                         </div>
                     </div>
                 </div>
                 
                 <p>Besides, the bottleneck link could also have an impact on the global traffic. If the speed of bottleneck is increased (r<sub>ij</sub>' = r<sub>ij</sub>(1+α)), then q<sub>c</sub> of the traffic network is significantly increased. However, if we increase the link speed randomly, there is no such effect for the global network.</p>
-                
-                <div class="image-section">
-                    <img src="../assets/NOOC_project/images/linear_fit.png" alt="Linear Fit Analysis" class="project-image">
-                    <p class="image-caption">Figure 9: Percolation cluster power law analysis (slope=-2.07)</p>
-                </div>
             </div>
 
             <div class="section">
