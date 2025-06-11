@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Network Organization and Congestion Analysis</title>
+    <title>Percolation and Urban Traffic Dynamics</title>
     <link rel="stylesheet" href="../styles.css?v=20250611">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -17,101 +17,139 @@
         </div>
     </nav>
 
-    <div class="project-detail">
-        <header class="project-header">
-            <h1>Network Organization and Congestion Analysis of Traffic Networks</h1>
-            <div class="project-metadata">
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Percolation and Urban Traffic Dynamics</h1>
+            </div>
+            <div class="metadata-grid">
                 <div class="metadata-item">
-                    <h3>Location</h3>
-                    <p>Barcelona, Spain</p>
+                    <span class="metadata-label"></span>
+                    <span>Network Research</span>
                 </div>
                 <div class="metadata-item">
-                    <h3>Period</h3>
-                    <p>2024</p>
+                    <span></span>
                 </div>
                 <div class="metadata-item">
-                    <h3>Category</h3>
-                    <p>Network Analysis, Traffic Engineering</p>
+                    <span class="metadata-label"></span>
+                    <span>2024</span>
                 </div>
             </div>
-        </header>
+        </div>
 
         <div class="project-content">
-            <section>
-                <h2>Project Overview</h2>
-                <p>This project investigates urban traffic networks through the lens of graph theory and percolation analysis. By examining how traffic congestion affects network connectivity, we provide insights into the macroscopic characteristics of urban mobility systems.</p>
+            <div class="project-summary">
+                <h2>Abstract</h2>
+                <p>Analysis of an urban traffic network has always been a non-trivial task for city planners and engineers due to its high complexity in real life. By utilizing a functional construction method, we interpret traffic data into an abstract graph. Percolation theory applied on the network allow us to analyze the critical phenomenon of urban traffic dynamics. We found that the critical percolation exponent determines the type of the network, which switches between a grid-like topology and a small-world model. The system bottleneck can also be identified by the percolation analysis. With the tools provided in this work, it would be helpful to analyze and to improve urban traffic networks for civil engineers.</p>
                 
-                <p>The research focuses on analyzing "how much a network suffers from congestion" — measuring how efficiently drivers can travel through a network while avoiding congested areas. We utilize network percolation concepts to evaluate traffic network functionality, examining how rising traffic demand leads to congestion that disconnects sections of the network.</p>
+                <div class="project-highlights">
+                    <h3>Key Findings</h3>
+                    <ul>
+                        <li>Percolation theory effectively characterizes urban traffic networks</li>
+                        <li>Critical threshold q<sub>c</sub> indicates network robustness</li>
+                        <li>Critical exponent τ reveals network topology type</li>
+                        <li>Identified traffic bottlenecks through percolation analysis</li>
+                        <li>Demonstrated network switching between grid and small-world models</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>1. Introduction</h2>
+                <p>The urban traffic network is one of the most nature but complex network arises in our daily life, while graph theory has successfully developed plenty of results on characterizing various types of networks. With the help of the theoretical results, it's now possible to analyze the macroscopic characteristics of urban traffic network.</p>
+                
+                <p>To analyze the organization and the quality of an urban traffic network, we consider that "how much a network suffers from congestion?" That is, how drivers can travel to their destination in the network within reasonable time, and free from any congestion? Since urban traffic network can be regarded as a 2D grid percolation process, we utilize the concept of network percolation to investigate the functionality of a traffic network. As the traffic demand rises within the network, some of the roads may become congested and thus become a dysfunctional link in the network. Thus, a network has good quality if it's mostly connected by a giant component via non-congested roads. Conversely, the network has a bad quality if the congested roads disconnect too many sections, resulting multiple small connected components.</p>
+                
+                <p>We can also analyze the dynamics of the network by comparing the evolution of congestion condition along different time. Thus, we can identify normal hours and rush hours along with their level of congestion, which should be beneficial information for city planners and civil engineers.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/Map of studied area.png" alt="Barcelona Study Area" class="project-image">
-                    <p class="image-caption">Figure 1: Map of the studied area in Barcelona, Spain.</p>
+                    <p class="image-caption">Figure 1: Studied area in Barcelona, Spain.</p>
                 </div>
-            </section>
+            </div>
 
-            <section>
-                <h2>Methodology</h2>
-                <p>Our approach constructs a functional traffic network based on percolation theory. Rather than focusing solely on structural topology, we consider roads as functionally linked only when their speed exceeds a specified threshold.</p>
+            <div class="section">
+                <h2>2. Methods</h2>
                 
-                <h3>Functional Network Construction</h3>
-                <p>Roads are classified into distinct states based on their speed. A road is considered functional only if its velocity meets a given demand threshold q ∈ [0,1]. We normalize measured speed data against a standard maximal value to obtain relative speeds, then compare these with the threshold to determine functionality.</p>
+                <h3>2.1 Functional Traffic Network Construction</h3>
+                <p>In order to analyze the percolation transition in dynamic traffic network, a framework is built based on percolation theory. Instead of constructing a network based on the structure topology, only roads in the network with a speed greater than a specified threshold are considered functionally linked in this framework.</p>
                 
-                <h3>Critical Threshold Analysis</h3>
-                <p>As the threshold q increases from 0 to 1, the functional network becomes increasingly fragmented (traffic percolation). We identify q<sub>c</sub>(t) as the critical threshold where the giant component breaks down into disconnected local traffic clusters.</p>
+                <p>Roads in real-world traffic networks can be divided into distinct states based on their speed. A road is considered as functional only if its velocity level meets a given demand. A variable threshold q ∈ [0, 1] is set to denote the speed demand of drivers at a given time. Measured data of speed is sorted during a long period of time for each road segment in increasing order, the 95 percentile is chosen as the standard maximal value of this road. Then the speed of each road from site i to site j at time is normalized to get the relative speed. Since the road network is a directed graph, the speed is usually different based on the direction of the traffic flow.</p>
+                
+                <h3>2.2 Critical Threshold q<sub>c</sub></h3>
+                <p>We construct a functional network of the traffic dynamics from the original topology for any given q. If q=0, every road section meets demand, and the functioning traffic network is identical to the previous network. On the other hand, if q=1, since almost all the links are removed from the original network, the functional network becomes completely fragmented. The functional traffic network becomes diluted as q grows from 0 to 1, which is known as "traffic percolation". q<sub>c</sub>(t) is the crucial threshold value of q in traffic percolation, where the huge component of the dynamical network breaks down into fragmented local traffic clusters and the second biggest cluster reaches its maximum size.</p>
                 
                 <div class="image-section">
                     <div class="image-grid">
                         <div>
                             <img src="../assets/NOOC_project/images/before.png" alt="Before Congestion" class="project-image">
-                            <p class="image-caption">Figure 2: Network before congestion threshold.</p>
+                            <p class="image-caption">Figure 2: Network before reaching critical threshold.</p>
                         </div>
                         <div>
                             <img src="../assets/NOOC_project/images/after.png" alt="After Congestion" class="project-image">
-                            <p class="image-caption">Figure 3: Network after congestion threshold.</p>
+                            <p class="image-caption">Figure 3: Network after reaching critical threshold.</p>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section>
-                <h2>Key Findings</h2>
-                <p>Our analysis reveals important patterns in traffic network behavior:</p>
+            <div class="section">
+                <h2>3. Results</h2>
                 
-                <ul>
-                    <li>The critical threshold q<sub>c</sub> indicates network robustness against congestion</li>
-                    <li>The critical percolation exponent τ captures the network topology type</li>
-                    <li>Connectivity analysis identifies bottlenecks that significantly impact traffic flow</li>
-                    <li>Different time periods (normal hours vs. rush hours) show distinct percolation patterns</li>
-                </ul>
-                
-                <div class="image-section">
-                    <img src="../assets/NOOC_project/images/qc-t.png" alt="Critical Threshold Analysis" class="project-image">
-                    <p class="image-caption">Figure 4: Analysis of critical threshold over time.</p>
-                </div>
+                <h3>3.1 Critical Threshold Analysis</h3>
+                <p>By analyzing the network at different threshold values, we identified the critical threshold where the giant component breaks down. This critical point reveals important information about the network's robustness and structure.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/G and SG.png" alt="Component Size Analysis" class="project-image">
-                    <p class="image-caption">Figure 5: Giant component and second-largest component size analysis during percolation.</p>
+                    <p class="image-caption">Figure 4: Giant component (G) and second-largest component (SG) size analysis during percolation.</p>
                 </div>
-            </section>
-
-            <section>
-                <h2>Conclusion</h2>
-                <p>We have demonstrated a series of tools for traffic network analysis. The metrics presented indicate different characteristics of a traffic network:</p>
-                <ul>
-                    <li>The critical threshold q<sub>c</sub> indicates network robustness</li>
-                    <li>The critical percolation exponent τ captures network type</li>
-                    <li>Connectivity analysis reveals congestion formation mechanisms</li>
-                </ul>
-                <p>Our findings provide deeper understanding of congestion formation and dissipation mechanisms. Future work will focus on controlling bottleneck traffic to mitigate city traffic congestion.</p>
+                
+                <h3>3.2 Temporal Variation in Network Properties</h3>
+                <p>The critical threshold varies throughout the day, providing insights into traffic patterns and congestion dynamics. We observed distinct differences between normal periods and rush hours.</p>
+                
+                <div class="image-section">
+                    <img src="../assets/NOOC_project/images/qc-t.png" alt="Critical Threshold Analysis" class="project-image">
+                    <p class="image-caption">Figure 5: Analysis of critical threshold over time periods.</p>
+                </div>
+                
+                <h3>3.3 Power Law Analysis</h3>
+                <p>We analyzed the scaling behavior of the network components near the critical threshold. The critical exponent τ provides information about the network type, distinguishing between grid-like structures and small-world networks.</p>
+                
+                <div class="image-section">
+                    <div class="image-grid">
+                        <div>
+                            <img src="../assets/NOOC_project/images/tau_qc_base2.png" alt="Critical Exponent Analysis" class="project-image">
+                            <p class="image-caption">Figure 6: Critical exponent analysis for directed network.</p>
+                        </div>
+                        <div>
+                            <img src="../assets/NOOC_project/images/tau_qc_undir_base2.png" alt="Undirected Critical Exponent" class="project-image">
+                            <p class="image-caption">Figure 7: Critical exponent analysis for undirected network.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>3.4 Bottleneck Identification</h3>
+                <p>The percolation analysis allowed us to identify critical bottlenecks in the traffic network. These are key areas where congestion has the most significant impact on overall network connectivity.</p>
                 
                 <div class="image-section">
                     <img src="../assets/NOOC_project/images/linear_fit.png" alt="Linear Fit Analysis" class="project-image">
-                    <p class="image-caption">Figure 6: Linear fit analysis of network performance metrics.</p>
+                    <p class="image-caption">Figure 8: Linear fit analysis of network performance metrics.</p>
                 </div>
-            </section>
+            </div>
+
+            <div class="section">
+                <h2>4. Conclusion</h2>
+                <p>We have demonstrated a series of tools for traffic network analysis. The metrics presented in the previous sections indicate different characteristics of a traffic network. The critical threshold q<sub>c</sub> indicates the robustness of a network; the critical percolation exponent τ roughly captures the type of a network, and the connectivity of distant points.</p>
+                
+                <p>Meanwhile, based on the finding of the impact of bottleneck, we have a deeper understanding for congestion formation and dissipation mechanisms. In the future, the control of bottleneck traffic can have a significant effect for mitigating the city traffic congestion.</p>
+            </div>
+            
+            <div class="section">
+                <h2>Acknowledgments</h2>
+                <p>The authors thank Prof. Matthias Grossglauser and Prof. Patrick Thiran for the detailed instructions during the lecture, as well as the kind support from our assistant Loïs Huguenin-Dumittan.</p>
+            </div>
         </div>
-    </div>
+    </section>
 
     <script src="../script.js?v=20250611"></script>
 </body>
