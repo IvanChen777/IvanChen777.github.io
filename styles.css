@@ -367,13 +367,13 @@ nav a:hover {
 }
 
 .profile-image img {
-    width: 100%;
+    width: 260%;
     height: 100%;
     display: block;
     object-fit: cover;
     border: none;
-    object-position: 0% center;
-    margin-left: 0%;
+    object-position: 40% center;
+    margin-left: -120%;
 }
 
 .profile-image::after {
