@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Large Scale Data Analysis - Robust Journey Planning</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .diagram {
+            font-family: monospace;
+            white-space: pre;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            line-height: 1.3;
+            border: 1px solid #ddd;
+        }
+        .math {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            margin: 20px 0;
+        }
+        .highlight {
+            background-color: #fffacd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .note {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 5px solid #3498db;
+            margin: 20px 0;
+        }
+        .flow-diagram {
+            text-align: center;
+            margin: 30px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        /* Project header styling */
+        .project-header {
+            margin-bottom: 30px;
+        }
+        .title-row h1 {
+            margin-top: 0;
+        }
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            margin-top: 15px;
+            font-family: 'Merriweather', serif;
+            font-size: 0.9em;
+        }
+        .metadata-left {
+            text-align: left;
+        }
+        .metadata-center {
+            text-align: center;
+        }
+        .metadata-right {
+            text-align: right;
+        }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <section class="project-detail">
+        <div class="project-header">
+            <div class="title-row">
+                <h1>Large Scale Data Analysis<br>Robust Journey Planning</h1>
+            </div>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL COM-490</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Spring 2023</div>
+            </div>
+        </div>
+
+    <div class="container">
+        
+        <div class="note">
+            <strong>Project Overview:</strong> This document provides a comprehensive explanation of the datasets used in the Robust Journey Planning project for the Zürich public transport network. The project aims to build a route planner that accounts for uncertainties in travel times and provides routes with confidence levels.
+        </div>
+
+        <h2>1. Introduction</h2>
+        <p>
+            The Robust Journey Planning project uses several preprocessed datasets to model the public transport network in Zürich. These datasets represent different aspects of the network, including stops, connections, schedules, and historical delay information. Together, they enable the system to plan routes that account for uncertainties and provide confidence levels for making connections.
+        </p>
+
+        <h2>2. Key Datasets</h2>
+        
+        <h3>2.1 Stops Data (<code>stops_df.pickle</code>)</h3>
+        <p>This dataset contains information about public transport stops in the Zürich area.</p>
+        <table>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Data Type</th>
+            </tr>
+            <tr>
+                <td><code>stop_id</code></td>
+                <td>Unique identifier for the stop</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>stop_name</code></td>
+                <td>Name of the stop</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>stop_lat</code></td>
+                <td>Latitude coordinate</td>
+                <td>Float</td>
+            </tr>
+            <tr>
+                <td><code>stop_lon</code></td>
+                <td>Longitude coordinate</td>
+                <td>Float</td>
+            </tr>
+        </table>
+
+        <h3>2.2 Network Connections (<code>df_edges_filtered.pickle</code>)</h3>
+        <p>This is the core dataset representing the public transport network as a directed graph. Each row represents a connection between two stops.</p>
+        <table>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Data Type</th>
+            </tr>
+            <tr>
+                <td><code>src</code></td>
+                <td>Source stop ID</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>dst</code></td>
+                <td>Destination stop ID</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>dep_time</code></td>
+                <td>Departure time from source</td>
+                <td>String (HH:MM:SS format)</td>
+            </tr>
+            <tr>
+                <td><code>arr_time</code></td>
+                <td>Arrival time at destination</td>
+                <td>String (HH:MM:SS format)</td>
+            </tr>
+            <tr>
+                <td><code>transport_type</code></td>
+                <td>Type of transport (train, bus, etc.)</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>line_id</code></td>
+                <td>Line identifier</td>
+                <td>Integer</td>
+            </tr>
+            <tr>
+                <td><code>type</code></td>
+                <td>Transport type (train, bus, tram, walk)</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>trip_id</code></td>
+                <td>Unique identifier for the trip</td>
+                <td>String</td>
+            </tr>
+        </table>
+
+        <h3>2.3 Walkable Pairs Data</h3>
+        <p>These datasets contain information about stops that are within walking distance of each other.</p>
+        
+        <h4>2.3.1 <code>walkable_pairs_dict.pickle</code></h4>
+        <p>A dictionary where:</p>
+        <ul>
+            <li><strong>Keys:</strong> Tuples of (source_stop_id, destination_stop_id)</li>
+            <li><strong>Values:</strong> Walking time in seconds</li>
+        </ul>
+        <p>Example: <code>('8502221:0:1', '8573718:0'): 130.22689819335938</code></p>
+
+        <h4>2.3.2 <code>walkable_pairs_distance_dict.pickle</code></h4>
+        <p>A dictionary where:</p>
+        <ul>
+            <li><strong>Keys:</strong> Tuples of (source_stop_id, destination_stop_id)</li>
+            <li><strong>Values:</strong> Walking distance in meters</li>
+        </ul>
+        <p>Example: <code>('8502221:0:1', '8573718:0'): 130.22689819335938</code></p>
+
+        <h3>2.4 Delay Statistics (<code>delays_df.pickle</code>)</h3>
+        <p>This dataset contains statistical information about delays at different stops and for different transport types.</p>
+        <table>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Data Type</th>
+            </tr>
+            <tr>
+                <td><code>stop_name</code></td>
+                <td>Name of the stop</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>transport_type</code></td>
+                <td>Type of transport (train, bus, etc.)</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>delay_mean</code></td>
+                <td>Mean delay in seconds</td>
+                <td>Float</td>
+            </tr>
+            <tr>
+                <td><code>delay_std</code></td>
+                <td>Standard deviation of delay in seconds</td>
+                <td>Float</td>
+            </tr>
+        </table>
+
+        <h3>2.5 Stop Times Data (<code>stop_times_df.pickle</code>)</h3>
+        <p>This dataset contains the scheduled arrival and departure times for each stop in each trip.</p>
+        <table>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Data Type</th>
+            </tr>
+            <tr>
+                <td><code>trip_id</code></td>
+                <td>Unique identifier for the trip</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>arrival_time</code></td>
+                <td>Scheduled arrival time at the stop</td>
+                <td>String (HH:MM:SS format)</td>
+            </tr>
+            <tr>
+                <td><code>departure_time</code></td>
+                <td>Scheduled departure time from the stop</td>
+                <td>String (HH:MM:SS format)</td>
+            </tr>
+            <tr>
+                <td><code>stop_id</code></td>
+                <td>Stop identifier</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>stop_sequence</code></td>
+                <td>Order of the stop in the trip</td>
+                <td>Integer</td>
+            </tr>
+        </table>
+
+        <h3>2.6 Stop Name to ID Dictionary (<code>name_to_id_dict.pickle</code>)</h3>
+        <p>A dictionary mapping stop names to their corresponding IDs.</p>
+        <ul>
+            <li><strong>Keys:</strong> Stop names (String)</li>
+            <li><strong>Values:</strong> Stop IDs (String)</li>
+        </ul>
+        <p>Example: <code>"Zürich HB": "8503000"</code></p>
+
+        <h2>3. Data Structure</h2>
+        <p>
+            The datasets are structured to represent a time-expanded graph of the public transport network. This graph structure is essential for finding optimal routes that respect time constraints and account for uncertainties.
+        </p>
+
+        <h3>3.1 Graph Representation</h3>
+        <p>
+            The network is represented as a directed graph where:
+        </p>
+        <ul>
+            <li><strong>Nodes:</strong> Represent stops at specific times</li>
+            <li><strong>Edges:</strong> Represent connections between stops, including:
+                <ul>
+                    <li><strong>Transport Edges:</strong> Connections via public transport (train, bus, tram)</li>
+                    <li><strong>Walking Edges:</strong> Connections via walking between nearby stops</li>
+                    <li><strong>Waiting Edges:</strong> Connections representing waiting at the same stop</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>3.2 Edge Weights</h3>
+        <p>
+            Each edge in the graph has a weight representing the travel time. For transport edges, this is the scheduled travel time. For walking edges, it's the estimated walking time based on distance. For waiting edges, it's the waiting time at the stop.
+        </p>
+
+        <h3>3.3 Time Dependency</h3>
+        <p>
+            The graph is time-dependent, meaning that the availability and weights of edges depend on the time of day. This is essential for representing the schedule-based nature of public transport.
+        </p>
+
+        <h2>4. Delay Modeling</h2>
+        <p>
+            One of the key features of the project is modeling delays to provide robust journey plans. This is done using historical delay data.
+        </p>
+
+        <h3>4.1 Delay Distributions</h3>
+        <p>
+            Delays are modeled as normal distributions with parameters (mean, standard deviation) specific to each stop and transport type. These parameters are derived from historical data.
+        </p>
+        <div class="math">
+            \[ \text{Delay} \sim \mathcal{N}(\mu, \sigma^2) \]
+            <p>Where:</p>
+            <ul>
+                <li>\(\mu\) is the mean delay (from <code>delay_mean</code>)</li>
+                <li>\(\sigma\) is the standard deviation of delay (from <code>delay_std</code>)</li>
+            </ul>
+        </div>
+
+        <h3>4.2 Connection Confidence</h3>
+        <p>
+            The confidence of making a connection is calculated based on the probability that the arrival at one stop plus the walking time (if applicable) is earlier than the departure from the next stop, accounting for potential delays.
+        </p>
+        <div class="math">
+            \[ P(\text{making connection}) = P(\text{arrival time} + \text{walking time} < \text{departure time}) \]
+            <p>This is calculated using the cumulative distribution function (CDF) of the normal distribution representing the difference between arrival and departure delays.</p>
+        </div>
+
+        <h2>5. Journey Planning Algorithm</h2>
+        <p>
+            The journey planning algorithm finds optimal routes considering both travel time and connection confidence.
+        </p>
+
+        <h3>5.1 Algorithm Overview</h3>
+        <ol>
+            <li><strong>Graph Construction:</strong> Build a time-expanded graph from the network data</li>
+            <li><strong>Path Finding:</strong> Use a modified Dijkstra's algorithm to find k-shortest paths</li>
+            <li><strong>Confidence Calculation:</strong> Calculate the confidence level for each path</li>
+            <li><strong>Result Ranking:</strong> Rank paths based on arrival time and confidence</li>
+        </ol>
+
+        <h3>5.2 Path Finding</h3>
+        <p>
+            The path finding algorithm uses a modified version of Dijkstra's algorithm that:
+        </p>
+        <ul>
+            <li>Respects time constraints (connections must be feasible in time)</li>
+            <li>Finds multiple alternative paths (k-shortest paths)</li>
+            <li>Handles walking transfers between stops</li>
+        </ul>
+
+        <h3>5.3 Confidence Calculation</h3>
+        <p>
+            For each path, the algorithm calculates:
+        </p>
+        <ul>
+            <li>The probability of making each connection in the path</li>
+            <li>The overall confidence level as the product of individual connection probabilities</li>
+        </ul>
+        <div class="math">
+            \[ \text{Confidence} = \prod_{i=1}^{n} P(\text{making connection}_i) \]
+            <p>Where \(n\) is the number of connections in the path.</p>
+        </div>
+
+        <h2>6. Practical Examples</h2>
+        <p>
+            To better understand how the journey planning system works, let's examine some practical examples using a simplified dataset. These examples illustrate the key concepts and algorithms used in the project.
+        </p>
+
+        <h3>6.1 Sample Transport Network</h3>
+        <p>
+            Below is a visualization of our sample transport network with 6 stops (Zurich HB, Oerlikon, Stadelhofen, Airport, Winterthur, and Uster) connected by train and tram routes. Solid lines represent transport connections, while dashed green lines represent walkable connections.
+        </p>
+        
+        <div class="flow-diagram">
+            <img src="../assets/large_scale_data_analysis_figures/transport_network.png" alt="Transport Network Graph">
+            <p><em>Figure 1: Sample Transport Network Graph showing stops and connections</em></p>
+        </div>
+
+        <h3>6.2 Time-Expanded Graph</h3>
+        <p>
+            For journey planning, the system uses a time-expanded graph where each node represents a stop at a specific time. This allows the algorithm to find paths that respect the time constraints of the schedule.
+        </p>
+        
+        <div class="flow-diagram">
+            <img src="../assets/large_scale_data_analysis_figures/time_expanded_graph.png" alt="Time-Expanded Graph">
+            <p><em>Figure 2: Time-Expanded Graph showing a sample route from Zürich HB to Uster</em></p>
+        </div>
+        
+        <div class="note">
+            <p><strong>Understanding the Time-Expanded Graph:</strong></p>
+            <ul>
+                <li>Each <strong>node</strong> represents a stop (Zürich HB, Stadelhofen, or Uster) at a specific time</li>
+                <li><strong>Blue solid arrows</strong> represent train connections between stops</li>
+                <li><strong>Green dashed arrows</strong> represent walking connections (e.g., from Zürich HB to Stadelhofen)</li>
+                <li><strong>Gray dotted arrows</strong> represent waiting at the same stop</li>
+                <li>The vertical axis shows the time progression from 8:00 to 9:00</li>
+                <li>The horizontal axis shows the three stops with their letter codes (A, B, C)</li>
+            </ul>
+            <p>This visualization demonstrates how the planner can find multiple route options, including direct trains, walking transfers, and connections with waiting time.</p>
+        </div>
+
+        <h3>6.3 Sample Route</h3>
+        <p>
+            Here's an example of a route from Zurich HB to Uster based on the time-expanded graph:
+        </p>
+        
+        <div class="flow-diagram">
+            <img src="../assets/large_scale_data_analysis_figures/sample_route.png" alt="Route Visualization">
+            <p><em>Figure 3: Visualization of a sample route from Zurich HB to Uster with walking and train connections</em></p>
+        </div>
+        
+        <div class="note">
+            <p><strong>Route Details:</strong></p>
+            <ul>
+                <li>Depart Zürich HB (A) at 08:05 by walking</li>
+                <li>Arrive at Stadelhofen (B) at 08:15</li>
+                <li>Wait at Stadelhofen for 5 minutes</li>
+                <li>Depart Stadelhofen (B) at 08:20 by train</li>
+                <li>Arrive at Uster (C) at 08:40</li>
+                <li>Total journey time: 35 minutes</li>
+            </ul>
+        </div>
+
+        <h3>6.4 Delay Distributions</h3>
+        <p>
+            The system uses historical delay data to model the probability distributions of delays at each stop. These distributions are used to calculate the confidence level for making connections.
+        </p>
+
+        <h3>6.5 Path Finding Algorithm</h3>
+        <p>
+            The path finding algorithm uses NetworkX's shortest_simple_paths function to find k-shortest paths between the source and target stops. For each path, it calculates the total travel time, number of transfers, and confidence level.
+        </p>
+        
+        <p>
+            The implementation uses NetworkX's efficient graph algorithms and handles both scheduled transport connections and walking transfers seamlessly. The algorithm prioritizes paths with lower total weights (typically representing travel time), but also provides alternative routes that might have different characteristics (fewer transfers, different transport modes, etc.).
+        </p>
+
+        <h3>6.6 Confidence Calculation</h3>
+        <p>
+            The system calculates the confidence level for making all connections in a journey. This is based on historical delay data for each stop and transport type.
+        </p>
+        
+        <div class="flow-diagram">
+            <img src="../assets/large_scale_data_analysis_figures/confidence_calculation.png" alt="Confidence Calculation">
+            <p><em>Figure 4: Visualization of confidence calculation</em></p>
+        </div>
+        
+        <p>
+            The confidence calculation algorithm works as follows:
+        </p>
+        <ol>
+            <li><strong>Group by trips:</strong> Group the path segments by trip ID to identify transfers.</li>
+            <li><strong>For each transfer:</strong>
+                <ul>
+                    <li>Retrieve arrival delay statistics for the arrival stop of the first trip.</li>
+                    <li>Retrieve departure delay statistics for the departure stop of the second trip.</li>
+                    <li>Calculate the maximum allowed delay based on the scheduled transfer time and walking time (if applicable).</li>
+                    <li>For intermediate connections: Integrate over the probability distribution of departure delays to calculate the probability of missing the connection.</li>
+                    <li>For the final connection to the destination: Calculate the probability of arriving later than the desired arrival time.</li>
+                </ul>
+            </li>
+            <li><strong>Calculate overall confidence:</strong> Multiply the probabilities of making each connection to get the overall confidence level.</li>
+        </ol>
+        
+        <p>
+            The mathematical formula for calculating the probability of missing a connection is:
+        </p>
+        
+        \[P(\text{missing connection}) = \int_{-\infty}^{\infty} P(D_{\text{arr}} > \Delta t + d | D_{\text{dep}} = d) \cdot P(D_{\text{dep}} = d) \, dd\]
+        
+        <p>
+            Where:
+        </p>
+        <ul>
+            <li>\(D_{\text{arr}}\) is the arrival delay (modeled as a normal distribution)</li>
+            <li>\(D_{\text{dep}}\) is the departure delay (modeled as a normal distribution)</li>
+            <li>\(\Delta t\) is the scheduled transfer time minus the walking time</li>
+        </ul>
+
+        <h3>6.7 Route Sorting and Presentation</h3>
+        <p>
+            After calculating multiple potential routes and their confidence scores, the journey planner sorts and presents them to the user. This process works as follows:
+        </p>
+        <ol>
+            <li><strong>Initial Route Finding:</strong> The planner first finds k-shortest paths based on travel time using the <code>route</code> method in the Planner class.</li>
+            <li><strong>Confidence Calculation:</strong> For each potential route, the system calculates a confidence score using the <code>add_delays</code> method in the DelayPredictor class:</li>
+            <ul>
+                <li>Each path is analyzed to identify all transfers between different trips</li>
+                <li>For each transfer, the probability of missing the connection is calculated</li>
+                <li>The overall confidence score is computed as the product of probabilities of making each connection</li>
+                <li>The confidence score is stored in the path object along with detailed information about each transfer</li>
+            </ul>
+            <li><strong>Route Sorting:</strong> By default, routes are sorted by arrival time to prioritize earlier arrivals:</li>
+            <code>actual_paths = sorted(actual_paths, key=lambda x: get_sec(x["arrival_time"]))</code>
+            <li><strong>Route Presentation:</strong> In the user interface, routes are displayed with three key metrics:</li>
+            <ul>
+                <li>Departure and arrival times</li>
+                <li>Total journey duration</li>
+                <li>Confidence score (Q) displayed as a percentage</li>
+            </ul>
+        </ol>
+        <p>
+            This approach allows users to quickly compare routes based on multiple criteria. While routes are initially sorted by arrival time, the confidence score (Q) provides critical information about reliability. Users can choose routes with slightly longer travel times but higher confidence scores if making connections is a priority.
+        </p>
+
+        <h3>6.8 Algorithm Summary</h3>
+        <p>
+            The journey planning system integrates several key components to provide reliable route recommendations:
+        </p>
+        <ol>
+            <li><strong>Graph Construction:</strong> A directed graph represents the transport network with nodes for stops at specific times.</li>
+            <li><strong>Path Finding:</strong> The k-shortest paths algorithm finds multiple route options between origin and destination.</li>
+            <li><strong>Walking Transfers:</strong> The system considers walking connections between nearby stops with accurate transfer times.</li>
+            <li><strong>Confidence Calculation:</strong> Statistical methods calculate the probability of making each connection based on historical delay data.</li>
+            <li><strong>Route Presentation:</strong> Routes are presented with arrival/departure times, journey duration, and confidence scores.</li>
+        </ol>
+        
+
+
+        <h2>7. Conclusion</h2>
+        <p>
+            The datasets in this project form a comprehensive model of the Zürich public transport network, enabling robust journey planning that accounts for uncertainties. By combining schedule information with historical delay statistics, the system can provide routes with confidence levels, helping users make informed decisions about their travel options.
+        </p>
+        <p>
+            The approach used in this project demonstrates how data science techniques can be applied to improve public transport planning, making it more reliable and user-friendly. The practical examples provided in this documentation illustrate the key concepts and algorithms used in the project, making it easier to understand and extend.
+        </p>
+    </div>
+
+    <div class="back-to-projects">
+        <a href="../index.html#projects">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+    </section>
+</body>
+</html>
