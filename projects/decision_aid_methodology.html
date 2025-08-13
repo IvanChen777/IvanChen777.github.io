@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision-aid Methodology for Transportation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            chtml: {
+                scale: 1.2  // Increase the size of all mathematics by 20%
+            },
+            startup: {
+                ready: function() {
+                    MathJax.startup.defaultReady();
+                }
+            },
+            options: {
+                renderActions: {
+                    addMenu: [], // Removes the MathJax context menu
+                    checkLoading: [1000, 40, 'every 100ms'] // Increase checking frequency
+                }
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Merriweather', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.3em;
+        }
+        h3 {
+            font-size: 1.4em;
+            margin-top: 1.2em;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+            background-color: #f0f7fc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .metadata-label {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        .metadata-value {
+            font-size: 0.95em;
+        }
+        .image-container {
+            margin: 2em 0;
+            text-align: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .image-caption {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+            font-size: 0.9em;
+        }
+        .note-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .note-box h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-x: auto;
+        }
+        .equation-block {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            overflow-x: auto;
+            font-size: 1.05em;
+        }
+        
+        .equation-block p {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        /* Add more space between multiple equations */
+        .equation-block p + p {
+            margin-top: 25px;
+            padding-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <section class="project-detail">
+        <div class="back-button">
+            <a href="../index.html#projects"><i class="fas fa-arrow-left"></i> Back to Projects</a>
+        </div>
+        
+        <div class="project-header">
+            <h1>Decision-aid Methodology for Transportation</h1>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL TRANSP-OR</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Mar. 2022 - Jun. 2022</div>
+            </div>
+        </div>
+
+    <h2>Project Overview</h2>
+    <p>
+        This project addresses the complex problem of airline hub allocation and route reorganization with the dual objectives of maximizing overall profit and minimizing costs in establishing and operating an airline transport network. The methodology combines hub location decisions with revenue management techniques to establish competitive advantages in a market-driven environment.
+    </p>
+    <p>
+        The project tackles both deterministic and stochastic versions of the problem, developing mathematical models that can be solved using optimization techniques. The approach is particularly valuable for airlines seeking to redesign their networks and establish centralized control centers.
+    </p>
+
+    <h2>Problem Formulation</h2>
+    
+    <h3>Network Structure</h3>
+    <p>
+        The project models a multi-layered airline network as an undirected graph with specific constraints:
+    </p>
+    <ul>
+        <li>The central hub is predefined</li>
+        <li>Two hubs must be selected from ten potential nodes</li>
+        <li>Transportation demand exists only between the ten nodes (excluding the central hub)</li>
+        <li>No direct connections are allowed between non-hub nodes</li>
+        <li>The central hub can only connect to hub nodes</li>
+    </ul>
+
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/sto-graph.png" alt="Network Structure Visualization">
+        <div class="image-caption">Figure 1: Graphical representation of the optimal hub allocation from the deterministic model. Nodes 4 and 8 are selected as hubs, connecting to the central hub.</div>
+    </div>
+
+    <h3>Mathematical Models</h3>
+    <p>
+        The project develops both non-linear and linear mathematical formulations for two scenarios:
+    </p>
+    
+    <h4>Deterministic Problem</h4>
+    <p>
+        The deterministic model seeks to maximize profit by optimizing hub locations, route assignments, and ticket sales. The key components include:
+    </p>
+    
+    <h4>Decision Variables</h4>
+    <div class="equation-block">
+        <p>\(h_j\): Binary variable indicating if node \(j\) is selected as a hub</p>
+        <p>\(a_{ij}\): Binary variable indicating if node \(i\) is assigned to hub \(j\)</p>
+        <p>\(t_{imk}\): Integer variable representing number of tickets sold for origin-destination pair \((i,m)\) and customer class \(k\)</p>
+        <p>\(p_{imk}\): Integer variable representing protection level for origin-destination pair \((i,m)\) and customer class \(k\)</p>
+    </div>
+
+    <h4>Objective Function</h4>
+    <div class="equation-block">
+        <p>\[\max Z = \sum_{i}\sum_{m}\sum_{k} r_{imk}t_{imk} - \sum_{i}\sum_{j}\sum_{m}\sum_{k} C_{1k}t_{imk}a_{ij}a_{mj} - \sum_{i}\sum_{j}\sum_{m}\sum_{n}\sum_{k} C_{2k}t_{imk}a_{ij}a_{mn}(1-a_{ij}a_{mj})\]</p>
+    </div>
+    
+    <h5>Linear Transformation</h5>
+    <p>
+        To solve the model efficiently using CPLEX, the non-linear terms are transformed into linear form by introducing additional variables and constraints:
+    </p>
+    
+    <div class="equation-block">
+        <p>\[U_{imj} = a_{ij}(1-a_{mj}) \quad \forall i,j,m \in I\]</p>
+        <p>\[O_{imjk} = t_{imk} \cdot a_{ij}(1-a_{mj}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[N_{imjk} = t_{imk} \cdot a_{ij} \quad \forall i,j,m \in I, \forall k \in K\]</p>
+    </div>
+    
+    <p>The linearized objective function becomes:</p>
+    
+    <div class="equation-block">
+        <p>\[\max Z = \sum_{i \in I} \sum_{m \in I} \sum_{k \in K} r_{imk} \cdot t_{imk}\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} C_{2k} \cdot (dist_{j0} \cdot O_{imjk} + dist_{0j} \cdot O_{mijk})\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} C_{1k} \cdot (dist_{ij} \cdot N_{imjk} + dist_{ji} \cdot N_{mijk}) - \sum_{j \in I} Fixedcost_{j} \cdot h_{j}\]</p>
+    </div>
+    
+    <p>With additional constraints to ensure the linearization is valid:</p>
+    
+    <div class="equation-block">
+        <p>\[U_{imj} \geq a_{ij} - a_{mj} \quad \forall i,j,m \in I\]</p>
+        <p>\[U_{imj} \geq 0 \quad \forall i,j,m \in I\]</p>
+        <p>\[O_{imjk} \geq t_{imk} - M(1-U_{imj}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[O_{mijk} \geq t_{mik} - M(1-U_{imj}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[N_{imjk} \geq t_{imk} - M(1-a_{ij}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[N_{mijk} \geq t_{mik} - M(1-a_{ij}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[O_{imjk} \geq 0 \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[N_{imjk} \geq 0 \quad \forall i,j,m \in I, \forall k \in K\]</p>
+    </div>
+
+    <h4>Stochastic Problem</h4>
+    <p>
+        The stochastic model accounts for demand uncertainty across multiple scenarios, incorporating protection levels for different customer classes. This approach allows for more robust decision-making in uncertain environments.
+    </p>
+    
+    <h5>Non-linear Formulation</h5>
+    <p>
+        The stochastic model extends the deterministic model by adding scenario-based variables and protection levels:
+    </p>
+    
+    <div class="equation-block">
+        <p>\[\max Z = \sum_{i \in I} \sum_{m \in I} \sum_{k \in K} \sum_{s \in S} t^s_{imk} \cdot r_{imk} \cdot p^s_{imk}\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} \sum_{s \in S} C_{1k} \cdot (p^s_{imk} \cdot dist_{ij} \cdot t^s_{imk} + p^s_{imk} \cdot dist_{ji} \cdot t^s_{mik}) \cdot a_{ij}\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} \sum_{s \in S} C_{2k} \cdot (p^s_{imk} \cdot dist_{j0} \cdot t^s_{imk} + p^s_{imk} \cdot dist_{0j} \cdot t^s_{mik}) \cdot [a_{ij}(1-a_{mj})]\]</p>
+        <p>\[- \sum_{j \in I} Fixedcost_{j} \cdot h_{j}\]</p>
+    </div>
+    
+    <p>Where:</p>
+    <div class="equation-block">
+        <p>\(S\): Set of scenarios</p>
+        <p>\(t^s_{imk}\): Number of tickets sold from origin \(i\) to destination \(m\) for customer class \(k\) in scenario \(s\)</p>
+        <p>\(p^s_{imk}\): Probability of scenario \(s\) for origin \(i\), destination \(m\), and customer class \(k\)</p>
+        <p>\(Z_{imk}\): Protection level for origin \(i\), destination \(m\), and customer class \(k\)</p>
+    </div>
+    
+    <p>Additional constraints for the stochastic model include:</p>
+    
+    <div class="equation-block">
+        <p>\[t^s_{imk} \leq d^s_{imk} \quad \forall i,m \in I, \forall k \in K, \forall s \in S \quad \text{(Tickets sold cannot exceed demand in each scenario)}\]</p>
+        <p>\[t^s_{imk} \leq Z_{imk} \quad \forall i,m \in I, \forall k \in K, \forall s \in S \quad \text{(Tickets sold cannot exceed protection level)}\]</p>
+        <p>\[\lceil\sum_{m \in I} \sum_{k \in K} Z_{imk}/Q1\rceil \leq \sum_{j \in I} NFNH_{ij} \cdot a_{ij} + M \cdot h_{i} \quad \forall i \in I \quad \text{(Flight capacity constraint)}\]</p>
+        <p>\[t^s_{imk} \geq 0 \quad \forall i,m \in I, \forall k \in K, \forall s \in S\]</p>
+        <p>\[Z_{imk} \geq 0 \quad \forall i,m \in I, \forall k \in K\]</p>
+    </div>
+    
+    <h5>Linear Transformation</h5>
+    <p>
+        Similar to the deterministic model, the stochastic model is linearized by introducing additional variables:
+    </p>
+    
+    <div class="equation-block">
+        <p>\[U_{imj} = a_{ij}(1-a_{mj}) \quad \forall i,j,m \in I\]</p>
+        <p>\[O^s_{imjk} = t^s_{imk} \cdot a_{ij}(1-a_{mj}) \quad \forall i,j,m \in I, \forall k \in K, \forall s \in S\]</p>
+        <p>\[G_{imjk} = Z_{imk} \cdot a_{ij}(1-a_{mj}) \quad \forall i,j,m \in I, \forall k \in K\]</p>
+        <p>\[N^s_{imjk} = t^s_{imk} \cdot a_{ij} \quad \forall i,j,m \in I, \forall k \in K, \forall s \in S\]</p>
+        <p>\[E_{imjk} = Z_{imk} \cdot a_{ij} \quad \forall i,j,m \in I, \forall k \in K\]</p>
+    </div>
+    
+    <p>The linearized objective function for the stochastic model becomes:</p>
+    
+    <div class="equation-block">
+        <p>\[\max Z = \sum_{i \in I} \sum_{m \in I} \sum_{k \in K} \sum_{s \in S} p^s_{imk} \cdot r_{imk} \cdot t^s_{imk}\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} \sum_{s \in S} C_{2k} \cdot (p^s_{imk} \cdot dist_{j0} \cdot O^s_{imjk} + p^s_{mik} \cdot dist_{0j} \cdot O^s_{mijk})\]</p>
+        <p>\[- \sum_{i \in I} \sum_{m \in I\setminus\{i\}} \sum_{j \in I} \sum_{k \in K} \sum_{s \in S} C_{1k} \cdot (p^s_{imk} \cdot dist_{ij} \cdot N^s_{imjk} + p^s_{mik} \cdot dist_{ji} \cdot N^s_{mijk})\]</p>
+        <p>\[- \sum_{j \in I} Fixedcost_{j} \cdot h_{j}\]</p>
+    </div>
+
+    <h2>Solution Methodology</h2>
+    
+    <h3>CPLEX Implementation - Deterministic Model</h3>
+    <p>
+        The deterministic mathematical model was implemented in OPL (Optimization Programming Language) and solved using CPLEX Studio. The implementation involved:
+    </p>
+    <ul>
+        <li>Defining variables and decision variables</li>
+        <li>Formulating the objective function</li>
+        <li>Implementing all necessary constraints</li>
+        <li>Transforming non-linear constraints into linear form for improved computational efficiency</li>
+    </ul>
+
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/variables.png" alt="Variable Definitions in OPL">
+        <div class="image-caption">Figure 2: Variable definitions for the deterministic model in OPL</div>
+    </div>
+
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/goal function.png" alt="Objective Function in OPL">
+        <div class="image-caption">Figure 3: Objective function formulation for the deterministic model in OPL</div>
+    </div>
+
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/constrains.png" alt="Constraints in OPL">
+        <div class="image-caption">Figure 4: Constraints implementation for the deterministic model in OPL</div>
+    </div>
+    
+    <h3>CPLEX Implementation - Stochastic Model</h3>
+    <p>
+        The stochastic version of the problem incorporates uncertainty in demand across multiple scenarios. The implementation in OPL includes additional variables and constraints to handle this uncertainty.
+    </p>
+    
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/variables2.png" alt="Stochastic Model Variables">
+        <div class="image-caption">Figure 5: Variable definitions for the stochastic model in OPL</div>
+    </div>
+    
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/goal function2.png" alt="Stochastic Model Objective Function">
+        <div class="image-caption">Figure 6: Objective function formulation for the stochastic model in OPL</div>
+    </div>
+    
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/constrains2.png" alt="Stochastic Model Constraints">
+        <div class="image-caption">Figure 7: Constraints implementation for the stochastic model in OPL</div>
+    </div>
+
+    <h3>Meta-heuristic Approach</h3>
+    <p>
+        For solving larger instances of the problem, the project proposes a meta-heuristic approach using simulated annealing with four specialized operators. This approach is necessary because the exact solution methods become computationally intractable as the problem size increases.
+    </p>
+    
+    <div class="image-container">
+        <img src="../assets/Decision-aid images/operator.png" alt="Meta-heuristic Operator Structure">
+        <div class="image-caption">Figure 8: Graphical representation of the operator structure for the meta-heuristic approach</div>
+    </div>
+    
+    <p>
+        The meta-heuristic approach employs a hierarchical structure of four operators, each focusing on a different aspect of the solution:
+    </p>
+    
+    <h4>1. Ticket Sales Operator</h4>
+    <p>
+        This operator determines the optimal number of tickets to sell for each scenario, origin-destination pair, and customer class. The process follows these steps:
+    </p>
+    <ol>
+        <li>Start with an initial feasible solution for ticket sales</li>
+        <li>Check feasibility against demand constraints (tickets sold ≤ demand)</li>
+        <li>Apply repair functions if constraints are violated</li>
+        <li>Compare profit with neighboring solutions and move toward optimal solutions using simulated annealing</li>
+    </ol>
+    <p>
+        The neighborhood structure for this operator involves increasing or decreasing the number of tickets sold for each scenario, origin-destination pair, and customer class, while keeping the hub selection and route assignments fixed.
+    </p>
+    
+    <div class="note-box">
+        <h4>Repair Function for Demand Constraint</h4>
+        <p>
+            When ticket sales exceed demand, the repair function iteratively reduces the number of tickets sold until all demand constraints are satisfied.
+        </p>
+    </div>
+    
+    <h4>2. Protection Level Operator</h4>
+    <p>
+        This operator optimizes the protection levels for each origin-destination pair and customer class, building upon the solution from the first operator. The process includes:
+    </p>
+    <ol>
+        <li>Start with the locally optimal solution from the ticket sales operator</li>
+        <li>Check feasibility against flight capacity constraints</li>
+        <li>Apply repair functions if constraints are violated</li>
+        <li>Use simulated annealing to find the best protection level configuration</li>
+    </ol>
+    <p>
+        The neighborhood structure involves increasing or decreasing protection levels while keeping hub selection and route assignments fixed.
+    </p>
+    
+    <div class="note-box">
+        <h4>Repair Function for Flight Capacity</h4>
+        <p>
+            When protection levels exceed available flight capacity, the repair function iteratively reduces protection levels until all capacity constraints are satisfied.
+        </p>
+    </div>
+    
+    <h4>3. Route Selection Operator</h4>
+    <p>
+        This operator determines the optimal routes between non-hub nodes and hub nodes, building upon the solutions from the previous operators:
+    </p>
+    <ol>
+        <li>Start with the locally optimal solution from the protection level operator</li>
+        <li>Check feasibility of all constraints</li>
+        <li>Use simulated annealing to find the best route configuration</li>
+    </ol>
+    <p>
+        The neighborhood structure involves changing route assignments while keeping hub selections fixed.
+    </p>
+    
+    <h4>4. Hub Selection Operator</h4>
+    <p>
+        This operator identifies the optimal pair of hubs from the ten candidate nodes, representing the highest level of the decision hierarchy:
+    </p>
+    <ol>
+        <li>Start with the locally optimal solution from the route selection operator</li>
+        <li>Check feasibility of all constraints</li>
+        <li>Use simulated annealing to find the best hub configuration</li>
+    </ol>
+    <p>
+        The neighborhood structure involves changing one hub at a time and recalculating the optimal solution using the previous three operators.
+    </p>
+    
+    <div class="note-box">
+        <h4>Simulated Annealing Implementation</h4>
+        <p>
+            The simulated annealing algorithm used in this approach allows the search to escape local optima by occasionally accepting worse solutions based on a gradually decreasing temperature parameter. This increases the likelihood of finding the global optimum or a high-quality solution.
+        </p>
+    </div>
+
+    <h2>Results and Analysis</h2>
+    
+    <h3>Optimal Solution</h3>
+    <p>
+        The deterministic model identified nodes 4 and 8 as optimal hub locations, with specific node assignments:
+    </p>
+    <ul>
+        <li>Nodes 2, 3, 5, 6, 7, 9, 10 connect to hub 4</li>
+        <li>Node 1 connects to hub 8</li>
+        <li>Both hubs 4 and 8 connect to the central hub</li>
+    </ul>
+    <p>
+        This configuration achieved an objective value (profit) of 1,884,002.59 units.
+    </p>
+
+    <h3>Ticket Allocation</h3>
+    <p>
+        The solution provides detailed ticket allocation for each origin-destination pair and customer class (Business and Economy). The model successfully balances demand satisfaction with capacity constraints to maximize overall profit.
+    </p>
+
+
+
+    <h3>Sensitivity Analysis and Case Studies</h3>
+    <p>
+        The project includes detailed sensitivity analysis for several key parameters to understand how changes in the problem parameters affect the optimal solution and overall profit. Three specific case studies were analyzed:
+    </p>
+    
+    <div class="note-box">
+        <h4>Case Study 1: Increased Ticket Revenue</h4>
+        <p>
+            When the revenue for Business class tickets between spoke nodes 3 and 4 is drastically increased, two scenarios emerge:
+        </p>
+        <ul>
+            <li><strong>Unsatisfied demand:</strong> If the demand between nodes 3 and 4 was previously not fully satisfied, the model will prioritize selling tickets for this route first due to the increased revenue potential (r<sub>imk</sub>). This leads to higher ticket sales between these nodes and an increase in total profit.</li>
+            <li><strong>Already satisfied demand:</strong> If the demand between nodes 3 and 4 was already fully satisfied, increasing the ticket revenue won't change the number of tickets sold, but will still increase the total profit due to the higher revenue per ticket.</li>
+        </ul>
+    </div>
+    
+    <div class="note-box">
+        <h4>Case Study 2: Higher Cost Discount Factor</h4>
+        <p>
+            When the cost discount factor is increased (resulting in a higher discount):
+        </p>
+        <ul>
+            <li>The cost from hub to central hub (C<sub>2k</sub>) becomes lower relative to the cost between non-hub and hub nodes (C<sub>1k</sub>)</li>
+            <li>This leads to more tickets being sold between nodes that do not belong to the same hub, as the cost penalty for routing through the central hub is reduced</li>
+            <li>Nodes become more evenly distributed between the two hubs to maximize the utilization of available flights</li>
+            <li>The total profit increases due to the more balanced node distribution and lower transportation costs</li>
+        </ul>
+    </div>
+    
+    <div class="note-box">
+        <h4>Case Study 3: Increased Seat Capacity</h4>
+        <p>
+            When the number of available seats in type 2 legs (between hubs and central hub) is increased:
+        </p>
+        <ul>
+            <li>Initially, the total profit increases as more passengers can be accommodated on flights crossing the central hub</li>
+            <li>The lower transfer cost (C<sub>2k</sub>) makes these routes more profitable, leading to more balanced node distribution between the two hubs</li>
+            <li>However, once all demand is satisfied, further increases in seat capacity will not increase profit, as no additional tickets can be sold</li>
+            <li>This demonstrates that capacity constraints are binding only up to a certain point, after which demand constraints become the limiting factor</li>
+        </ul>
+    </div>
+    
+    <p>
+        These case studies highlight the complex interplay between revenue management, network design, and capacity allocation in the airline hub location problem. The sensitivity analysis provides valuable insights for decision-makers to understand how changes in various parameters affect the optimal solution and overall profitability.
+    </p>
+
+    <h2>Conclusions and Applications</h2>
+    
+    <p>
+        The decision-aid methodology developed in this project provides a comprehensive framework for optimizing airline hub location and revenue management decisions. The key contributions include:
+    </p>
+    
+    <ul>
+        <li>Integration of hub location decisions with revenue management techniques</li>
+        <li>Development of both deterministic and stochastic mathematical models</li>
+        <li>Transformation of non-linear constraints to linear form for computational efficiency</li>
+        <li>Design of a meta-heuristic approach for solving large-scale instances</li>
+        <li>Sensitivity analysis to guide decision-making under different scenarios</li>
+    </ul>
+    
+    <p>
+        This methodology can be applied by airlines and other transportation providers to optimize their network structure, improve resource allocation, and enhance profitability in competitive markets.
+    </p>
+
+    <div class="note-box">
+        <h4>Practical Applications</h4>
+        <p>
+            The models and algorithms developed in this project can help transportation companies:
+        </p>
+        <ul>
+            <li>Redesign their hub-and-spoke networks for maximum efficiency</li>
+            <li>Optimize ticket pricing and allocation strategies</li>
+            <li>Make robust decisions under demand uncertainty</li>
+            <li>Evaluate the impact of capacity changes and cost structures</li>
+            <li>Balance service quality with operational costs</li>
+        </ul>
+    </div>
+
+    <h2>References</h2>
+    <ol>
+        <li>Hou, Y. T., & Huo, J. Z., & Chu, F. (2019). An Integrated Problem of-Hub Location and Revenue Management with Multiple Capacity Levels under Disruptions. <em>Journal of Advanced Transportation</em>.</li>
+        <li>Huo, J. Z., Hou, Y. T., Chu, F., & He, J. K. (2019). A combined average-case and worst-case analysis for an integrated hub location and revenue management problem. <em>Discrete Dynamics in Nature and Society</em>.</li>
+    </ol>
+
+    </section>
+</body>
+</html>
