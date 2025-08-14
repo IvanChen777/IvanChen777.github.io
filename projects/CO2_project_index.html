@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Data & CO2 Emission Analysis</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            chtml: {
+                scale: 1.2
+            },
+            startup: {
+                ready: function() {
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Merriweather', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        
+        .epfl-logo {
+            height: 60px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        
+        .authors {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .abstract {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        
+        .equation-block {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            overflow-x: auto;
+            font-size: 1.05em;
+        }
+        
+        .equation-block p {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .equation-block p + p {
+            margin-top: 25px;
+            padding-top: 5px;
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .image-caption {
+            font-style: italic;
+            margin-top: 10px;
+            color: #555;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .model-comparison {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        
+        .model-card {
+            width: 30%;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .model-card h3 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metadata-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metadata-label {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .highlight {
+            background-color: #fffacd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .conclusion {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <section class="project-detail">
+        <div class="back-button">
+            <a href="../index.html#projects"><i class="fas fa-arrow-left"></i> Back to Projects</a>
+        </div>
+        
+        <div class="project-header">
+            <h1>Traffic Data & CO2 Emission Analysis</h1>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL LUTS</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Sep. 2021 - Jan. 2022</div>
+            </div>
+        </div>
+    
+    <div class="abstract">
+        <p><strong>Synthesis:</strong> This work presents an environmental analysis of traffic data in urban networks. We study different CO2 emission models to compare their effectiveness and put them in perspective. Additionally, we analyze the impact of driver behavior on emissions to understand how driving patterns affect environmental outcomes.</p>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Environmental concerns increasingly influence political decisions and consumer behavior. Traffic plays a significant role in CO2 emissions, making environmental analysis of traffic patterns crucial for sustainable urban planning.
+    </p>
+    <p>
+        This project uses data collected from drones and advanced computer techniques to identify and track vehicles. Using this tracking data, we estimate CO2 emissions following three different estimation models:
+    </p>
+    <ul>
+        <li>Average speed based model</li>
+        <li>Modal emission based model of type 1</li>
+        <li>Modal emission based model of type 2</li>
+    </ul>
+    <p>
+        By analyzing driving behavior characteristics for each vehicle, we also study the impact of driving patterns on emission levels.
+    </p>
+    
+    <h2>Data Analysis</h2>
+    <h3>Vehicle Characteristics</h3>
+    <p>
+        We first analyzed the data for each vehicle to determine average speed and time spent in each operating mode (acceleration, deceleration, idling, cruising).
+    </p>
+    
+    <div class="equation-block">
+        <p>\[\bar{v} = \frac{\text{total distance traveled}}{\text{total time}}\]</p>
+    </div>
+    
+    <p>
+        To distinguish operating modes, we used acceleration values calculated as the speed difference divided by the time interval:
+    </p>
+    
+    <div class="equation-block">
+        <p>\[\text{acceleration value} = \frac{v_2 - v_1}{\text{interval time}}\]</p>
+    </div>
+    
+    <p>
+        The criteria for classifying operating modes are:
+    </p>
+    <ul>
+        <li><strong>Acceleration:</strong> acceleration value > 0.5 m/s²</li>
+        <li><strong>Deceleration:</strong> acceleration value < -0.5 m/s²</li>
+        <li><strong>Cruising:</strong> -0.5 ≤ acceleration value ≤ 0.5 m/s² and average speed > 0.28 m/s</li>
+        <li><strong>Idling:</strong> -0.5 ≤ acceleration value ≤ 0.5 m/s² and average speed ≤ 0.28 m/s</li>
+    </ul>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Vehicle Type</th>
+                <th>Average Speed (km/h)</th>
+                <th>Acceleration (% of time)</th>
+                <th>Deceleration (% of time)</th>
+                <th>Cruising (% of time)</th>
+                <th>Idling (% of time)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Car</td>
+                <td>13.17</td>
+                <td>18.92</td>
+                <td>20.09</td>
+                <td>40.39</td>
+                <td>20.60</td>
+            </tr>
+            <tr>
+                <td>Motorcycle</td>
+                <td>18.94</td>
+                <td>21.95</td>
+                <td>24.44</td>
+                <td>33.51</td>
+                <td>20.10</td>
+            </tr>
+            <tr>
+                <td>Heavy Vehicle</td>
+                <td>10.49</td>
+                <td>15.91</td>
+                <td>16.97</td>
+                <td>45.47</td>
+                <td>21.65</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p>
+        Key observations from the data:
+    </p>
+    <ul>
+        <li>Motorcycles have the highest average speed, followed by cars and heavy vehicles</li>
+        <li>Motorcycles spend more time accelerating and decelerating than cars, which spend more time than heavy vehicles</li>
+        <li>Heavy vehicles spend the most time cruising</li>
+        <li>Idling times are similar across all vehicle types, likely due to traffic signals affecting all vehicles equally</li>
+    </ul>
+    
+    <h2>CO2 Emission Models</h2>
+    
+    <h3>Model 1: Average Speed Based</h3>
+    <p>This basic model uses the U-curve from EMFAC2007 that links vehicle speed with CO2 emissions.</p>
+    
+    <div class="equation-block">
+        <p>\[y = C \cdot [891-22.1360 \cdot x + 0.2346 \cdot x^2 - 0.0007 \cdot x^3] \text{ [g/km]}\]</p>
+    </div>
+    
+    <p>where:</p>
+    <ul>
+        <li>y = CO2 emission rate in g/km</li>
+        <li>x = average speed in km/h</li>
+        <li>C = 0.55 (correction factor)</li>
+    </ul>
+    
+    <p>The total CO2 emissions are calculated as:</p>
+    
+    <div class="equation-block">
+        <p>\[CO_{2_{total}} = \sum_{k=1}^n y_k \cdot d_k \text{ [g]}\]</p>
+    </div>
+    
+    <p>where n is the number of vehicles and d<sub>k</sub> is the distance covered by vehicle k in km.</p>
+    
+    <p><strong>Limitations:</strong> Does not account for different vehicle types or traffic effects like signal coordination.</p>
+    
+    <div class="image-container">
+        <img src="../assets/CO2_project_images/U-Curve.png" alt="U-curve from EMFAC2007" style="max-width: 600px;">
+        <p class="image-caption">U-curve from EMFAC2007 showing the relationship between speed and CO2 emissions</p>
+    </div>
+    
+    <h3>Model 2: Modal Emission Based (Type 1)</h3>
+    <p>This model bases emissions on the operating mode of vehicles (acceleration, deceleration, cruising, idling).</p>
+    <p>Emissions are time-dependent rather than distance-dependent.</p>
+    
+    <div class="image-container">
+        <img src="../assets/CO2_project_images/Step_3_table.png" alt="Emission values for different operating modes" style="max-width: 400px;">
+        <p class="image-caption">Emission values for different operating modes</p>
+    </div>
+    
+    <p>For each vehicle, emissions are calculated as:</p>
+    
+    <div class="equation-block">
+        <p>\[CO_{2_{vehicle}} = \sum_{j=1}^4 CF \cdot Emission_{operating-mode_j} \cdot t_j \text{ [g]}\]</p>
+    </div>
+    
+    <p>where CF is the conversion factor dependent on vehicle type, and t<sub>j</sub> is the time spent in operating mode j.</p>
+    
+    <p>Uses correction factors: 0.5 for motorcycles and 5 for heavy vehicles.</p>
+    <p><strong>Limitations:</strong> Cannot handle parameters like road gradient and assumes steady-state emissions.</p>
+    
+    <h3>Model 3: Modal Emission Based (Type 2)</h3>
+    <p>This model uses Vehicle Speed Power Factor (VSP) that considers both speed and acceleration:</p>
+    
+    <div class="equation-block">
+        <p>\[VSP = 0.278 \cdot v \cdot [0.305 \cdot a+0.132] + 0.0000065 \cdot v^3 \text{ [kW/ton]}\]</p>
+    </div>
+    
+    <p>where v = speed (km/h) and a = acceleration (km/h/s)</p>
+    
+    <p>The VSP is linked to 14 emission modes with corresponding CO2 values:</p>
+    
+    <div class="image-container">
+        <img src="../assets/CO2_project_images/VSP.png" alt="VSP table showing 14 emission modes" style="max-width: 800px;">
+        <p class="image-caption">VSP table showing 14 emission modes with corresponding CO2 values</p>
+    </div>
+    
+    <p><strong>Advantages:</strong> Can capture grade and use of accessories, more realistic than Type 1.</p>
+    
+    <h3>Model Comparison Results</h3>
+    
+    <div class="equation-block">
+        <p>The three models produce significantly different results when applied to the same traffic data:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Total CO2 Emissions (g)</th>
+                    <th>Relative Difference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Average Speed Based Model</td>
+                    <td>283,324</td>
+                    <td>-29.0%</td>
+                </tr>
+                <tr>
+                    <td>Modal Emission Based Model (Type 1)</td>
+                    <td>365,384</td>
+                    <td>-8.5%</td>
+                </tr>
+                <tr>
+                    <td>Modal Emission Based Model (Type 2)</td>
+                    <td>399,267</td>
+                    <td>Baseline</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>
+        Breaking down the emissions by vehicle type using the most accurate model (Type 2):
+    </p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Vehicle Type</th>
+                <th>Average CO2 Emission (g/s)</th>
+                <th>Average CO2 Emission (g/km)</th>
+                <th>Percentage of Total Emissions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Car</td>
+                <td>1.42</td>
+                <td>387.9</td>
+                <td>68.3%</td>
+            </tr>
+            <tr>
+                <td>Motorcycle</td>
+                <td>0.71</td>
+                <td>134.8</td>
+                <td>7.2%</td>
+            </tr>
+            <tr>
+                <td>Heavy Vehicle</td>
+                <td>7.10</td>
+                <td>2,432.5</td>
+                <td>24.5%</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p>
+        The Average Speed Based Model gives much lower total CO2 values than the other models because:
+    </p>
+    <ul>
+        <li>It doesn't consider operating modes (acceleration, deceleration, cruising, idling)</li>
+        <li>It doesn't distinguish between vehicle types (cars, motorcycles, heavy vehicles)</li>
+        <li>It can't account for the emissions difference between consistent speed driving versus frequent acceleration/deceleration</li>
+        <li>It uses a simplified U-curve that may not accurately represent real-world conditions</li>
+    </ul>
+    
+    <p>
+        The Modal Emission Based Model (Type 2) is considered the most accurate as it directly incorporates:
+    </p>
+    <ul>
+        <li>Instantaneous velocity values</li>
+        <li>Acceleration/deceleration patterns</li>
+        <li>Vehicle-specific emission factors</li>
+        <li>More granular operating mode classifications (14 VSP modes)</li>
+    </ul>
+    
+    <!-- U-Curve image is already shown in Model 1 section -->
+    
+    <h2>Driver Behavior Impact on Emissions</h2>
+    
+    <div class="equation-block">
+        <p>
+            We analyzed how driver aggressiveness affects CO2 emissions by categorizing drivers based on the percentage of time spent in acceleration and deceleration modes:
+        </p>
+        
+        <div class="image-container">
+            <img src="../assets/CO2_project_images/table_aggresivity.PNG" alt="Driver aggressiveness classification" style="max-width: 400px;">
+            <p class="image-caption">Classification of driver behavior based on percentage of time in acceleration/deceleration</p>
+        </div>
+        
+        <ul>
+            <li><strong>Aggressive driver:</strong> > 50% of time in acceleration/deceleration</li>
+            <li><strong>Standard driver:</strong> 30-50% of time in acceleration/deceleration</li>
+            <li><strong>Smooth driver:</strong> < 30% of time in acceleration/deceleration</li>
+        </ul>
+    </div>
+    
+    <h3>Emissions by Driver Type</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Driver Type</th>
+                <th>Average CO2 Emission (g/km)</th>
+                <th>Average Distance Traveled (m)</th>
+                <th>Average CO2 Emission (g/s)</th>
+                <th>Average Travel Time (s)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Aggressive Driver</td>
+                <td>258.24</td>
+                <td>273</td>
+                <td>1.95</td>
+                <td>36.04</td>
+            </tr>
+            <tr>
+                <td>Smooth Driver</td>
+                <td>658.74</td>
+                <td>282</td>
+                <td>1.08</td>
+                <td>172.04</td>
+            </tr>
+            <tr>
+                <td>Standard Driver</td>
+                <td>395.57</td>
+                <td>416</td>
+                <td>1.51</td>
+                <td>108.74</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3>The Emissions Paradox</h3>
+    
+    <div class="equation-block">
+        <p>
+            Our analysis reveals a counterintuitive finding: when measured by distance (g/km), <strong>smooth drivers emit the most CO2</strong>, while <strong>aggressive drivers emit the least</strong>. However, when measured by time (g/s), <strong>aggressive drivers emit the most CO2</strong>, followed by standard drivers, with smooth drivers emitting the least.
+        </p>
+        
+        <p>
+            This apparent contradiction is explained by the significant difference in travel times:
+        </p>
+        
+        <ul>
+            <li>Aggressive drivers complete their journeys in just <strong>36.04 seconds</strong> (average)</li>
+            <li>Standard drivers take <strong>108.74 seconds</strong> (3x longer)</li>
+            <li>Smooth drivers take <strong>172.04 seconds</strong> (nearly 5x longer)</li>
+        </ul>
+        
+        <p>
+            While aggressive drivers emit more CO2 per second (1.95 g/s vs 1.08 g/s for smooth drivers), their higher average speed means they emit less CO2 per kilometer traveled.
+        </p>
+    </div>
+    
+    <h3>Policy Implications</h3>
+    
+    <p>
+        This finding challenges the common assumption that reducing speed always reduces emissions. The relationship between driving behavior and emissions is complex:
+    </p>
+    
+    <ul>
+        <li>Very slow driving can lead to higher emissions per distance traveled</li>
+        <li>Aggressive driving produces more emissions per second but fewer per kilometer</li>
+        <li>The optimal strategy for emission reduction may involve maintaining moderate speeds with minimal acceleration/deceleration</li>
+    </ul>
+    
+    <p>
+        Rather than simply encouraging slower driving, more effective solutions might include:
+    </p>
+    
+    <ul>
+        <li>Informing drivers of upcoming road conditions and traffic light timing</li>
+        <li>Implementing intelligent traffic management systems to reduce stop-and-go traffic</li>
+        <li>Designing road networks that allow for consistent, moderate speeds</li>
+        <li>Training drivers to avoid unnecessary acceleration and deceleration</li>
+    </ul>
+    
+    <div class="conclusion">
+        <h2>Conclusion</h2>
+        
+        <h3>Key Findings</h3>
+        <div class="equation-block">
+            <p>
+                This study analyzed CO2 emissions in urban traffic using three different models, revealing several important insights:
+            </p>
+            <ul>
+                <li>The Modal Emission Based Model of Type 2 provides the most realistic emission estimates by accounting for both speed and acceleration</li>
+                <li>Vehicle type significantly impacts emissions, with heavy vehicles emitting the most CO2 per second (7.10 g/s vs 1.42 g/s for cars)</li>
+                <li>Driver behavior has a complex relationship with emissions - aggressive drivers emit more CO2 per second but less per kilometer due to shorter travel times</li>
+                <li>Simply reducing speed may not always be the optimal solution for reducing emissions</li>
+            </ul>
+        </div>
+        
+        <h3>Recommendations</h3>
+        <div class="equation-block">
+            <p>Based on our analysis, we recommend the following approaches for reducing traffic-related CO2 emissions:</p>
+            <ul>
+                <li><strong>Advanced Traffic Management:</strong> Implement systems that reduce stop-and-go traffic and promote consistent speeds</li>
+                <li><strong>Driver Education:</strong> Train drivers to maintain moderate speeds with minimal acceleration/deceleration</li>
+                <li><strong>Vehicle Fleet Optimization:</strong> Given that heavy vehicles contribute disproportionately to emissions (24.5% of total emissions despite being fewer in number), prioritize efficiency improvements for these vehicles</li>
+                <li><strong>Emission Modeling:</strong> Use more sophisticated models like the Modal Emission Based Model (Type 2) for accurate environmental impact assessments</li>
+            </ul>
+        </div>
+        
+        <h3>Future Research</h3>
+        <p>
+            Future studies should explore the relationship between traffic signal coordination and emissions, as well as the impact of emerging technologies like connected vehicles on driving patterns and resulting emissions. Additionally, investigating the effects of road gradient and vehicle load on emissions would provide a more comprehensive understanding of urban traffic emissions.
+        </p>
+        
+        <p>
+            These findings highlight the importance of considering multiple factors when developing strategies to reduce traffic-related CO2 emissions in urban environments.
+        </p>
+    </div>
+    </section>
+</body>
+</html>
