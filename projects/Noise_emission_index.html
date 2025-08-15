@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Noise Emissions Analysis</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Merriweather', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            margin-top: 30px;
+            color: #34495e;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        
+        .abstract {
+            font-style: italic;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .image-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .caption {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        .equation {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .model-comparison {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        
+        .model-card {
+            flex: 1 1 30%;
+            margin: 10px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 300px;
+        }
+        
+        .model-card h3 {
+            margin-top: 0;
+            color: #2980b9;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .conclusion {
+            background-color: #edf7ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 40px;
+        }
+        
+        .conclusion h2 {
+            border-bottom: none;
+            margin-top: 0;
+        }
+        
+        .conclusion ul {
+            margin-left: 20px;
+            padding-left: 20px;
+        }
+        
+        .conclusion li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <section class="project-detail">
+        <div class="back-button">
+            <a href="../index.html#projects"><i class="fas fa-arrow-left"></i> Back to Projects</a>
+        </div>
+        
+        <div class="project-header">
+            <h1>Urban Noise Emissions Analysis</h1>
+            <div class="metadata-grid">
+                <div class="metadata-left">EPFL LUTS</div>
+                <div class="metadata-center"></div>
+                <div class="metadata-right">Feb. 2022 - Jun. 2022</div>
+            </div>
+        </div>
+    
+    <div class="abstract">
+        <p><strong>Synthesis:</strong> This research analyzes urban noise emissions using three different prediction models (NMPB, IMAGINE, and CNOSSOS) applied to traffic data collected by drones in Athens, Greece. The study compares these models' effectiveness in predicting noise levels from various vehicle types, evaluates their assumptions, and examines the spatial and temporal patterns of noise emissions in urban environments.</p>
+    </div>
+    
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>In the European Union, 72.5% of the population (approximately 340 million people) live in urban areas. This high concentration raises major questions about urban space organization to offer acceptable quality of life. Among the sources of discomfort perceived by city dwellers, noise is the phenomenon that causes the most discomfort after air pollution.</p>
+        
+        <p>The impact of noise exposure on the body has been extensively studied, with observed effects including sleep disturbance, loss of alertness and concentration, increased stress, blood pressure, and heart rate. This health impact comes at a financial cost to society and also affects wildlife, causing stress and complicating communication between individuals.</p>
+        
+        <div class="image-container">
+            <img src="../assets/noise emissions project/European noise emissions directive.png" alt="European noise emissions directive">
+            <div class="caption">Figure 1: European noise emissions directive regulating vehicle emissions</div>
+        </div>
+        
+        <p>The use of drones has revolutionized data collection for noise emission prediction models. It is now possible with a fleet of drones to collect sufficient information to determine the noise emissions of vehicle fleets over defined areas for extended periods. This approach significantly reduces the required labor compared to traditional methods using multiple microphones.</p>
+        
+        <div class="image-container">
+            <img src="../assets/noise emissions project/City noise emissions monitoring.png" alt="City noise emissions monitoring">
+            <div class="caption">Figure 2: City noise emissions monitoring using drone technology</div>
+        </div>
+    </section>
+    
+    <section id="noise-definition">
+        <h2>Noise Emissions Definition</h2>
+        <p>Noise emissions are loud or unpleasant sounds released into the atmosphere. The intensity of sound is measured in decibels (dB), using a logarithmic scale similar to how our ears perceive sound. A value expressed in dB(A) evaluates sound levels with A-weighting, established to account for the average sensitivity of people with normal hearing across frequency bands.</p>
+        
+        <div class="image-container">
+            <img src="../assets/noise emissions project/Decibel scale.png" alt="Decibel scale">
+            <div class="caption">Figure 3: Decibel scale showing common sound levels</div>
+        </div>
+    </section>
+    
+    <section id="data-preprocessing">
+        <h2>Data Preprocessing</h2>
+        <h3>pNEUMA Dataset</h3>
+        <p>This study uses the pNEUMA dataset, a large-scale open dataset featuring trajectories of half a million vehicles collected by a swarm of drones in downtown Athens, Greece. Specifically, data collected by drone number 8 over a 15-minute period during peak traffic was used to predict vehicle noise emissions.</p>
+        
+        <h3>Data Preparation</h3>
+        <p>The preprocessing involved:</p>
+        <ul>
+            <li>Removing outliers (vehicles with speeds above 130 km/h)</li>
+            <li>Adjusting data granularity from 0.04s to 1s to optimize computation time</li>
+        </ul>
+    </section>
+    
+    <section id="noise-models">
+        <h2>Noise Emissions Models</h2>
+        <p>Urban noise emission modeling requires sophisticated approaches to account for the complex interactions between vehicles, road surfaces, and traffic patterns. This study examines three state-of-the-art noise prediction models, each with distinct methodologies and applications:</p>
+        
+        <div class="image-container">
+            <img src="../assets/noise emissions project/Noise emissions models.png" alt="Noise emissions models">
+            <div class="caption">Figure 4: Overview of the three noise emissions models studied</div>
+        </div>
+        
+        <style>
+            .model-tabs {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            .model-tab {
+                padding: 12px 24px;
+                background-color: #f0f0f0;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                margin: 0 5px;
+                border-radius: 5px 5px 0 0;
+            }
+            
+            .model-tab.active {
+                background-color: #2980b9;
+                color: white;
+                border-bottom: none;
+            }
+            
+            .model-content {
+                border: 1px solid #ddd;
+                padding: 25px;
+                border-radius: 0 5px 5px 5px;
+                background-color: #f9f9f9;
+                margin-bottom: 30px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            }
+            
+            .model-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 15px;
+            }
+            
+            .model-header h3 {
+                margin: 0;
+                color: #2c3e50;
+                font-size: 1.6em;
+            }
+            
+            .model-origin {
+                background-color: #edf7ff;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 0.9em;
+                font-weight: bold;
+            }
+            
+            .model-section {
+                margin-bottom: 20px;
+            }
+            
+            .model-section h4 {
+                color: #34495e;
+                margin-bottom: 10px;
+                border-left: 3px solid #3498db;
+                padding-left: 10px;
+            }
+            
+            .equation-box {
+                background-color: #f5f5f5;
+                border-left: 4px solid #2980b9;
+                padding: 15px;
+                margin: 15px 0;
+                border-radius: 0 5px 5px 0;
+            }
+            
+            .interactive-formula {
+                position: relative;
+                padding: 10px;
+                margin: 15px 0;
+                font-size: 1.2em;
+                text-align: center;
+                background: linear-gradient(to right, #f9f9f9, #f0f8ff);
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .formula-variable {
+                color: #2980b9;
+                font-weight: bold;
+                cursor: help;
+                position: relative;
+                padding: 0 2px;
+                border-bottom: 1px dotted #2980b9;
+            }
+            
+            .formula-variable:hover::after {
+                content: attr(data-description);
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #34495e;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 0.8em;
+                white-space: nowrap;
+                z-index: 10;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+            
+            .formula-component {
+                display: inline-block;
+                margin: 0 5px;
+                vertical-align: middle;
+            }
+            
+            .formula-explanation {
+                font-style: italic;
+                color: #555;
+                margin-top: 5px;
+                font-size: 0.9em;
+            }
+            
+            .formula-comparison {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                margin: 30px 0;
+                justify-content: center;
+            }
+            
+            .formula-card {
+                flex: 1;
+                min-width: 300px;
+                max-width: 450px;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                background-color: white;
+                transition: transform 0.3s ease;
+            }
+            
+            .formula-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .formula-card h5 {
+                margin-top: 0;
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .formula-visual {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: 20px 0;
+            }
+            
+            .formula-diagram {
+                width: 100%;
+                height: 120px;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 10px 0;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .interactive-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin: 20px 0;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                border: 1px solid #e9ecef;
+            }
+            
+            .slider-container {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .slider-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .slider-label {
+                width: 120px;
+                font-weight: 500;
+                color: #2c3e50;
+            }
+            
+            .slider-value {
+                width: 60px;
+                text-align: center;
+                font-weight: bold;
+                color: #3498db;
+            }
+            
+            .formula-result {
+                margin-top: 15px;
+                padding: 10px;
+                background-color: #e8f4f8;
+                border-left: 4px solid #3498db;
+                font-weight: 500;
+                border-radius: 0 4px 4px 0;
+            }
+            
+            input[type="range"] {
+                flex-grow: 1;
+                height: 7px;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: #d1d1d1;
+                border-radius: 5px;
+                background-image: linear-gradient(#3498db, #3498db);
+                background-size: 50% 100%;
+                background-repeat: no-repeat;
+            }
+            
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                height: 18px;
+                width: 18px;
+                border-radius: 50%;
+                background: #3498db;
+                cursor: pointer;
+                box-shadow: 0 0 2px 0 #555;
+                transition: background .3s ease-in-out;
+            }
+            
+            input[type="range"]::-webkit-slider-thumb:hover {
+                background: #2980b9;
+            }
+            
+            .equation-title {
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #2c3e50;
+            }
+            
+            .model-comparison-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+            
+            .model-comparison-table th {
+                background-color: #2980b9;
+                color: white;
+                text-align: left;
+                padding: 12px;
+            }
+            
+            .model-comparison-table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .model-comparison-table tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+            
+            .feature-highlight {
+                font-weight: bold;
+                color: #2980b9;
+            }
+            
+            .model-limitations {
+                background-color: #fff8e1;
+                padding: 15px;
+                border-radius: 5px;
+                margin-top: 20px;
+                border-left: 4px solid #ffc107;
+            }
+            
+            .model-limitations h4 {
+                margin-top: 0;
+                color: #795548;
+            }
+        </style>
+        
+        <div class="model-tabs">
+            <div class="model-tab active" data-model="nmpb">NMPB Model</div>
+            <div class="model-tab" data-model="imagine">IMAGINE Model</div>
+            <div class="model-tab" data-model="cnossos">CNOSSOS Model</div>
+        </div>
+        
+        <div id="nmpb" class="model-content">
+            <div class="model-header">
+                <h3>NMPB Model (Nouvelle Méthode de Prévision du Bruit)</h3>
+                <span class="model-origin">French National Standard</span>
+            </div>
+            
+            <div class="model-section">
+                <h4>Overview</h4>
+                <p>The NMPB model, developed in France, is one of the earliest standardized methods for road traffic noise prediction in Europe. It was first published in 1996 and has been widely used for environmental noise assessment. The model takes a simplified approach to vehicle categorization and acceleration states, making it computationally efficient but potentially less precise in complex traffic scenarios.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Vehicle Categories</h4>
+                <p>The NMPB model classifies vehicles into just two categories:</p>
+                <ul>
+                    <li><span class="feature-highlight">Light Vehicles (LV):</span> Vehicles with a gross weight under 3.5 tons, including passenger cars, taxis, motorcycles, and light commercial vehicles</li>
+                    <li><span class="feature-highlight">Heavy Vehicles (HV):</span> Vehicles with a gross weight of 3.5 tons or more, including buses, trucks, and other heavy commercial vehicles</li>
+                </ul>
+                <p>This simplified categorization makes the model easier to implement but may reduce accuracy when dealing with diverse vehicle fleets.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Acceleration States</h4>
+                <p>Unlike more recent models, NMPB uses discrete acceleration states rather than continuous values:</p>
+                <ul>
+                    <li><span class="feature-highlight">Accelerating:</span> Vehicles increasing speed (positive acceleration)</li>
+                    <li><span class="feature-highlight">Steady:</span> Vehicles maintaining constant speed (zero acceleration)</li>
+                    <li><span class="feature-highlight">Decelerating:</span> Vehicles decreasing speed (negative acceleration)</li>
+                </ul>
+                <p>This discrete approach creates distinct clusters in noise emission patterns, as seen in the analysis results.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Noise Components</h4>
+                <p>The NMPB model calculates two primary noise components:</p>
+                <h4>Mathematical Formulation</h4>
+                <p>The NMPB model calculates noise emissions based on two primary components:</p>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <div class="equation-title">Rolling Noise:</div>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Rolling noise level at speed v (dB)">L<sub>r,R</sub>(v)</span> = 
+                            <span class="formula-variable" data-description="Base rolling noise coefficient (dB)">A<sub>R</sub></span> + 
+                            <span class="formula-variable" data-description="Rolling noise gradient coefficient">B<sub>R</sub></span> × 
+                            log(<span class="formula-variable" data-description="Vehicle speed (km/h)">v</span> / 
+                            <span class="formula-variable" data-description="Reference speed (70 km/h for LV, 50 km/h for HV)">v<sub>ref</sub></span>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">L<sub>r,R</sub>(v):</span> Rolling noise level at speed v in decibels (dB) - represents the noise generated by tire-road interaction</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">A<sub>R</sub>:</span> Base rolling noise coefficient in decibels (dB) - depends on vehicle category and road surface type</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">B<sub>R</sub>:</span> Rolling noise gradient coefficient - determines how quickly rolling noise increases with speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v:</span> Vehicle speed in kilometers per hour (km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v<sub>ref</sub>:</span> Reference speed - 70 km/h for light vehicles and 50 km/h for heavy vehicles</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> Rolling noise dominates at higher speeds (typically above 50 km/h for light vehicles). The logarithmic relationship means that doubling speed increases rolling noise by approximately B<sub>R</sub> × 3 dB.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                    <div class="equation-title">Propulsion Noise:</div>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Propulsion noise level at speed v (dB)">L<sub>p</sub>(v)</span> = 
+                            <span class="formula-variable" data-description="Propulsion noise at reference speed (dB)">L<sub>p</sub>(v<sub>ref</sub>)</span> + 
+                            <span class="formula-variable" data-description="Propulsion noise gradient coefficient">b</span> × 
+                            log(<span class="formula-variable" data-description="Vehicle speed (km/h)">v</span> / 
+                            <span class="formula-variable" data-description="Reference speed (70 km/h for LV, 50 km/h for HV)">v<sub>ref</sub></span>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>p</sub>(v):</span> Propulsion noise level at speed v in decibels (dB) - represents engine, exhaust, and drivetrain noise</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>p</sub>(v<sub>ref</sub>):</span> Propulsion noise at reference speed in decibels (dB) - baseline engine noise at standard speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">b:</span> Propulsion noise gradient coefficient - varies based on vehicle type and acceleration state:</li>
+                            <ul style="padding-left: 100px;">
+                                <li>Light vehicles: 12.5 (accelerating), 7.5 (steady), 6.5 (decelerating)</li>
+                                <li>Heavy vehicles: 12.5 (accelerating), 7.5 (steady), 6.5 (decelerating)</li>
+                            </ul>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v:</span> Vehicle speed in kilometers per hour (km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v<sub>ref</sub>:</span> Reference speed - 70 km/h for light vehicles and 50 km/h for heavy vehicles</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #fdebd0; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> Propulsion noise is dominant at lower speeds and during acceleration. The coefficient b is significantly higher during acceleration (12.5) compared to steady speed (7.5), reflecting the increased engine load and RPM.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                    <div class="equation-title">Total Noise Emission:</div>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Total noise emission level (dB)">L<sub>W</sub></span> = 
+                            10 × log<sub>10</sub>(
+                            10<sup><span class="formula-variable" data-description="Rolling noise level">L<sub>r,R</sub>/10</span></sup> + 
+                            10<sup><span class="formula-variable" data-description="Propulsion noise level">L<sub>p</sub>/10</span></sup>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>W</sub>:</span> Total noise emission level in decibels (dB) - the combined noise from both rolling and propulsion sources</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>r,R</sub>:</span> Rolling noise level in decibels (dB)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>p</sub>:</span> Propulsion noise level in decibels (dB)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">10<sup>x/10</sup>:</span> Converts decibel values to energy values before summation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8daef; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> This logarithmic summation accounts for the fact that decibels are logarithmic units. The dominant noise source (usually rolling noise at high speeds and propulsion noise at low speeds) will contribute most to the total noise level.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="model-limitations">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>Only valid for speeds between 20 km/h and 130 km/h</li>
+                    <li>Does not account for noise from stationary vehicles (assumes zero noise at zero speed)</li>
+                    <li>Limited vehicle categorization may reduce accuracy in diverse traffic scenarios</li>
+                    <li>Discrete acceleration states may not capture the nuanced effects of gradual acceleration changes</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="imagine" class="model-content" style="display: none;">
+            <div class="model-header">
+                <h3>IMAGINE Model (Improved Methods for the Assessment of Generic Noise Emissions)</h3>
+                <span class="model-origin">European Research Project</span>
+            </div>
+            
+            <div class="model-section">
+                <h4>Overview</h4>
+                <p>The IMAGINE model was developed as part of a European research project to improve noise prediction methods. It represents a significant advancement over earlier models by incorporating more detailed vehicle categorization, continuous acceleration values, and spectral analysis. The model is particularly well-suited for complex urban environments where traffic patterns vary significantly.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Vehicle Categories</h4>
+                <p>IMAGINE uses a more detailed classification system with four vehicle categories:</p>
+                <ul>
+                    <li><span class="feature-highlight">Category 1:</span> Light motor vehicles (passenger cars, vans ≤ 3.5 tons, SUVs, MPVs including trailers and caravans)</li>
+                    <li><span class="feature-highlight">Category 2:</span> Medium heavy vehicles (medium heavy vehicles, delivery vans > 3.5 tons, buses, touring cars with two axles and twin tire mounting)</li>
+                    <li><span class="feature-highlight">Category 3:</span> Heavy duty vehicles (heavy duty vehicles, touring cars, buses with three or more axles)</li>
+                    <li><span class="feature-highlight">Category 4:</span> Powered two-wheelers (mopeds, motorcycles with 2, 3 or 4 wheels)</li>
+                </ul>
+                <p>This more granular categorization allows for more precise noise predictions across different vehicle types.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Acceleration Treatment</h4>
+                <p>Unlike the NMPB model, IMAGINE treats acceleration as a continuous variable rather than discrete states. This allows for more nuanced modeling of noise emissions during gradual speed changes, which is particularly important in urban environments with frequent stops and starts.</p>
+                <p>The model applies an acceleration correction factor to the propulsion noise component, which varies based on the actual acceleration value measured or estimated for each vehicle.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Spectral Analysis</h4>
+                <p>A key advancement in the IMAGINE model is its use of octave and 1/3 octave band frequencies for noise prediction, allowing for more detailed spectral analysis. This approach provides a more comprehensive understanding of the frequency composition of traffic noise, which is important for assessing human perception and potential mitigation measures.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Mathematical Formulation</h4>
+                <p>The IMAGINE model uses more complex equations that incorporate acceleration directly:</p>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Rolling Noise Component</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Rolling noise level at speed v (dB)">L<sub>r</sub>(v)</span> = 
+                            <span class="formula-variable" data-description="Base rolling noise coefficient (dB)">A<sub>R</sub></span> + 
+                            <span class="formula-variable" data-description="Rolling noise gradient coefficient">B<sub>R</sub></span> × 
+                            log<sub>10</sub>(<span class="formula-variable" data-description="Vehicle speed (km/h)">v</span> / 
+                            <span class="formula-variable" data-description="Reference speed">v<sub>ref</sub></span>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">L<sub>r</sub>(v):</span> Rolling noise level at speed v in decibels (dB) - represents the noise generated by tire-road interaction</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">A<sub>R</sub>:</span> Base rolling noise coefficient in decibels (dB) - specific to each vehicle category and road surface type</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">B<sub>R</sub>:</span> Rolling noise gradient coefficient - typically ranges from 20 to 30 depending on vehicle category</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v:</span> Vehicle speed in kilometers per hour (km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v<sub>ref</sub>:</span> Reference speed - typically 70 km/h for light vehicles and 70 km/h for heavy vehicles in the IMAGINE model</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-diagram" style="margin: 15px 0;">
+                        <svg width="100%" height="120" viewBox="0 0 300 120">
+                            <!-- Speed axis -->
+                            <line x1="50" y1="80" x2="250" y2="80" stroke="#333" stroke-width="2"/>
+                            <text x="150" y="95" text-anchor="middle" font-size="12">Vehicle Speed (km/h)</text>
+                            <text x="50" y="95" text-anchor="middle" font-size="10">0</text>
+                            <text x="150" y="95" text-anchor="middle" font-size="10">70</text>
+                            <text x="250" y="95" text-anchor="middle" font-size="10">140</text>
+                            
+                            <!-- Noise level axis -->
+                            <line x1="50" y1="80" x2="50" y2="20" stroke="#333" stroke-width="2"/>
+                            <text x="30" y="50" text-anchor="middle" font-size="12" transform="rotate(-90,30,50)">Noise Level (dB)</text>
+                            <text x="45" y="80" text-anchor="end" font-size="10">0</text>
+                            <text x="45" y="50" text-anchor="end" font-size="10">50</text>
+                            <text x="45" y="20" text-anchor="end" font-size="10">100</text>
+                            
+                            <!-- Rolling noise curve -->
+                            <path d="M50,70 Q150,40 250,25" stroke="#3498db" stroke-width="3" fill="none"/>
+                            <text x="200" y="30" text-anchor="middle" font-size="10" fill="#3498db">Rolling Noise</text>
+                        </svg>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> Rolling noise increases logarithmically with speed, becoming the dominant noise source at higher speeds (typically above 40-50 km/h). The IMAGINE model calculates this component for each octave band, providing more detailed spectral information than the NMPB model.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Propulsion Noise with Acceleration</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Propulsion noise level at speed v and acceleration a (dB)">L<sub>p</sub>(v,a)</span> = 
+                            <span class="formula-variable" data-description="Propulsion noise at reference speed (dB)">L<sub>p</sub>(v<sub>ref</sub>)</span> + 
+                            <span class="formula-variable" data-description="Speed coefficient">b</span> × 
+                            log<sub>10</sub>(<span class="formula-variable" data-description="Vehicle speed (km/h)">v</span> / 
+                            <span class="formula-variable" data-description="Reference speed">v<sub>ref</sub></span>) + 
+                            <span class="formula-variable" data-description="Acceleration coefficient">c</span> × 
+                            <span class="formula-variable" data-description="Acceleration (m/s²)">a</span>
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>p</sub>(v,a):</span> Propulsion noise level at speed v and acceleration a in decibels (dB) - represents engine, exhaust, and drivetrain noise</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>p</sub>(v<sub>ref</sub>):</span> Propulsion noise at reference speed in decibels (dB) - baseline engine noise at standard speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">b:</span> Speed coefficient - determines how propulsion noise changes with speed (typically ranges from 5 to 10)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v:</span> Vehicle speed in kilometers per hour (km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v<sub>ref</sub>:</span> Reference speed - typically 70 km/h for all vehicle categories in the IMAGINE model</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">c:</span> Acceleration coefficient - determines how propulsion noise changes with acceleration:</li>
+                            <ul style="padding-left: 100px;">
+                                <li>Category 1 (light vehicles): 5.0</li>
+                                <li>Category 2 (medium heavy): 10.0</li>
+                                <li>Category 3 (heavy duty): 10.0</li>
+                                <li>Category 4 (two-wheelers): 15.0</li>
+                            </ul>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">a:</span> Acceleration in meters per second squared (m/s²) - positive for acceleration, negative for deceleration</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-diagram" style="margin: 15px 0;">
+                        <svg width="100%" height="120" viewBox="0 0 300 120">
+                            <!-- Base diagram -->
+                            <line x1="50" y1="80" x2="250" y2="80" stroke="#333" stroke-width="2"/>
+                            <line x1="50" y1="80" x2="50" y2="20" stroke="#333" stroke-width="2"/>
+                            <text x="150" y="95" text-anchor="middle" font-size="12">Acceleration (m/s²)</text>
+                            <text x="50" y="95" text-anchor="middle" font-size="10">-2</text>
+                            <text x="150" y="95" text-anchor="middle" font-size="10">0</text>
+                            <text x="250" y="95" text-anchor="middle" font-size="10">+2</text>
+                            <text x="30" y="50" text-anchor="middle" font-size="12" transform="rotate(-90,30,50)">Noise Level (dB)</text>
+                            
+                            <!-- Multiple propulsion noise curves for different speeds -->
+                            <path d="M50,60 Q150,50 250,10" stroke="#e74c3c" stroke-width="3" fill="none"/>
+                            <path d="M50,70 Q150,60 250,20" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,3" fill="none"/>
+                            <text x="200" y="20" text-anchor="middle" font-size="10" fill="#e74c3c">High Speed</text>
+                            <text x="200" y="40" text-anchor="middle" font-size="10" fill="#e74c3c">Low Speed</text>
+                        </svg>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #fdebd0; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The IMAGINE model's key innovation is treating acceleration as a continuous variable with a direct linear effect on propulsion noise. This allows for more accurate modeling of noise in urban environments with frequent speed changes. The coefficient c is higher for heavier vehicles, reflecting their greater noise increase during acceleration.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Total Noise Emission</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Total noise emission level (dB)">L<sub>W</sub></span> = 
+                            10 × log<sub>10</sub>(
+                            10<sup><span class="formula-variable" data-description="Rolling noise level">L<sub>r</sub>/10</span></sup> + 
+                            10<sup><span class="formula-variable" data-description="Propulsion noise level">L<sub>p</sub>/10</span></sup>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>W</sub>:</span> Total noise emission level in decibels (dB) - the combined noise from both rolling and propulsion sources</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>r</sub>:</span> Rolling noise level in decibels (dB) - calculated for each octave band</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">L<sub>p</sub>:</span> Propulsion noise level in decibels (dB) - calculated for each octave band</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #9b59b6;">10<sup>x/10</sup>:</span> Converts decibel values to energy values before summation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8daef; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The IMAGINE model calculates this total noise emission for each octave band separately, providing a detailed spectral profile of the noise. This spectral information is valuable for assessing human perception and designing noise mitigation measures.</p>
+                    </div>
+                </div>
+                
+                <p>This direct incorporation of acceleration as a continuous variable allows for more precise noise modeling in dynamic traffic conditions, especially at intersections and other areas with frequent speed changes.</p>
+            </div>
+            
+
+            
+            <div class="model-limitations">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>Requires detailed spectral data (octave bands) which may not be available in all datasets</li>
+                    <li>More computationally intensive than simpler models</li>
+                    <li>Assumes that stationary vehicles produce noise (engine idling), which may overestimate noise in some scenarios</li>
+                    <li>Requires accurate acceleration measurements for best results</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="cnossos" class="model-content" style="display: none;">
+            <div class="model-header">
+                <h3>CNOSSOS-EU Model (Common Noise Assessment Methods in Europe)</h3>
+                <span class="model-origin">Current EU Standard</span>
+            </div>
+            
+            <div class="model-section">
+                <h4>Overview</h4>
+                <p>The CNOSSOS-EU model represents the current European Union standard for noise assessment, developed to provide a harmonized methodology across all member states. Established under the Environmental Noise Directive (2002/49/EC), it builds upon previous models while introducing innovative approaches to acceleration effects based on spatial positioning relative to intersections.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Vehicle Categories</h4>
+                <p>CNOSSOS-EU uses the same four vehicle categories as the IMAGINE model:</p>
+                <ul>
+                    <li><span class="feature-highlight">Category 1:</span> Light motor vehicles</li>
+                    <li><span class="feature-highlight">Category 2:</span> Medium heavy vehicles</li>
+                    <li><span class="feature-highlight">Category 3:</span> Heavy duty vehicles</li>
+                    <li><span class="feature-highlight">Category 4:</span> Powered two-wheelers</li>
+                </ul>
+                <p>This consistency with the IMAGINE model facilitates comparison between the two approaches and allows for easier transition between methodologies.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Distance-Based Acceleration Correction</h4>
+                <p>The most distinctive feature of the CNOSSOS model is its innovative approach to acceleration effects. Rather than requiring direct acceleration measurements (which can be difficult to obtain), CNOSSOS uses the distance from intersections as a proxy for acceleration effects:</p>
+                <ul>
+                    <li>Vehicles near intersections are assumed to be accelerating or decelerating</li>
+                    <li>The correction factor decreases linearly with distance from the intersection</li>
+                    <li>Different correction factors are applied based on the type of intersection (traffic light vs. roundabout)</li>
+                </ul>
+                <p>This spatial approach makes the model particularly suitable for urban noise mapping where detailed acceleration data may not be available.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Mathematical Formulation</h4>
+                <p>The CNOSSOS model builds on the IMAGINE model's approach but introduces innovative distance-based correction factors for acceleration effects.</p>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Base Rolling Noise Emission</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Rolling noise power level (dB)">L<sub>WR,i,m</sub></span> = 
+                            <span class="formula-variable" data-description="Rolling noise coefficient a">a<sub>R,i,m</sub></span> + 
+                            <span class="formula-variable" data-description="Rolling noise coefficient b">b<sub>R,i,m</sub></span> × 
+                            log<sub>10</sub>(<span class="formula-variable" data-description="Vehicle speed (km/h)">v<sub>m</sub></span>/v<sub>ref</sub>) + 
+                            <span class="formula-variable" data-description="Road surface correction (dB)">\Delta L<sub>WR,road,i,m</sub></span>
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">L<sub>WR,i,m</sub>:</span> Rolling noise power level in decibels (dB) for frequency band i and vehicle category m</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">a<sub>R,i,m</sub>:</span> Rolling noise coefficient - represents the base noise level at reference speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">b<sub>R,i,m</sub>:</span> Rolling noise coefficient - determines how noise increases with speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v<sub>m</sub>:</span> Vehicle speed in km/h for category m</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v<sub>ref</sub>:</span> Reference speed (70 km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">\Delta L<sub>WR,road</sub>:</span> Correction for road surface properties in dB</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The rolling noise formula follows a logarithmic relationship with speed, similar to the IMAGINE model. The coefficients a and b are determined experimentally for each vehicle category and frequency band, providing spectral information that is valuable for noise mitigation planning.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Base Propulsion Noise Emission</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Propulsion noise power level (dB)">L<sub>WP,i,m</sub></span> = 
+                            <span class="formula-variable" data-description="Propulsion noise coefficient a">a<sub>P,i,m</sub></span> + 
+                            <span class="formula-variable" data-description="Propulsion noise coefficient b">b<sub>P,i,m</sub></span> × 
+                            (<span class="formula-variable" data-description="Vehicle speed (km/h)">v<sub>m</sub></span> - v<sub>ref</sub>)/v<sub>ref</sub> + 
+                            <span class="formula-variable" data-description="Road gradient correction (dB)">\Delta L<sub>WP,grad,i,m</sub></span>
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>WP,i,m</sub>:</span> Propulsion noise power level in decibels (dB) for frequency band i and vehicle category m</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">a<sub>P,i,m</sub>:</span> Propulsion noise coefficient - represents the base noise level at reference speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">b<sub>P,i,m</sub>:</span> Propulsion noise coefficient - determines how noise changes with speed</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v<sub>m</sub>:</span> Vehicle speed in km/h for category m</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">v<sub>ref</sub>:</span> Reference speed (70 km/h)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">\Delta L<sub>WP,grad</sub>:</span> Correction for road gradient in dB - accounts for increased engine load on slopes</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #fdebd0; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> Unlike rolling noise, propulsion noise follows a linear relationship with speed. This reflects the observation that engine noise increases more directly with engine load and RPM. The formula accounts for road gradient effects, which significantly impact engine noise, especially for heavy vehicles climbing slopes.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Total Noise with Acceleration Corrections</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Total noise power level (dB)">L<sub>W,i,m</sub></span> = 
+                            10 × log<sub>10</sub>(
+                            10<sup><span class="formula-variable" data-description="Rolling noise with correction">(L<sub>WR,i,m</sub> + \Delta L<sub>WR,acc,i,m</sub>)/10</span></sup> + 
+                            10<sup><span class="formula-variable" data-description="Propulsion noise with correction">(L<sub>WP,i,m</sub> + \Delta L<sub>WP,acc,i,m</sub>)/10</span></sup>)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">L<sub>W,i,m</sub>:</span> Total noise power level in decibels (dB) for frequency band i and vehicle category m</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">L<sub>WR,i,m</sub>:</span> Base rolling noise power level in decibels (dB)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">\Delta L<sub>WR,acc</sub>:</span> Rolling noise correction for acceleration effects in dB</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">L<sub>WP,i,m</sub>:</span> Base propulsion noise power level in decibels (dB)</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">\Delta L<sub>WP,acc</sub>:</span> Propulsion noise correction for acceleration effects in dB</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #2ecc71;">10<sup>x/10</sup>:</span> Converts decibel values to energy values before summation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #d5f5e3; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The CNOSSOS model's innovation is in the acceleration correction terms (\Delta L<sub>WR,acc</sub> and \Delta L<sub>WP,acc</sub>), which are based on distance from intersections rather than direct acceleration measurements. This makes the model more practical for large-scale noise mapping where detailed vehicle dynamics data may not be available.</p>
+                    </div>
+                </div>
+                
+                <h5>Interactive Distance-Based Correction Model</h5>
+                <p>Explore how distance from intersections affects noise calculations in the CNOSSOS model:</p>
+                
+                <div class="interactive-controls">
+                    <div class="slider-container">
+                        <div class="slider-row">
+                            <span class="slider-label">Distance from Intersection:</span>
+                            <input type="range" id="distance-slider" min="0" max="200" value="50" step="5">
+                            <span class="slider-value" id="distance-value">50 m</span>
+                        </div>
+                        
+                        <div class="slider-row">
+                            <span class="slider-label">Intersection Type:</span>
+                            <select id="intersection-type" style="flex-grow: 1;">
+                                <option value="traffic-light">Traffic Light (k=1)</option>
+                                <option value="roundabout">Roundabout (k=2)</option>
+                                <option value="priority">Priority Junction (k=3)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="slider-row">
+                            <span class="slider-label">Vehicle Category:</span>
+                            <select id="vehicle-category" style="flex-grow: 1;">
+                                <option value="category1">Category 1 (Light Vehicles)</option>
+                                <option value="category2">Category 2 (Medium Heavy)</option>
+                                <option value="category3">Category 3 (Heavy Duty)</option>
+                                <option value="category4">Category 4 (Two-Wheelers)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="formula-result">
+                        <div>Rolling Noise Correction: <span id="rolling-correction">1.5 dB</span></div>
+                        <div>Propulsion Noise Correction: <span id="propulsion-correction">3.0 dB</span></div>
+                    </div>
+                </div>
+                
+                <div class="formula-diagram" id="correction-graph" style="height: 200px;">
+                    <!-- Graph will be rendered here by JavaScript -->
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Rolling Noise Correction</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Rolling noise correction (dB)">ΔL<sub>WR,acc,i,m</sub></span> = 
+                            <span class="formula-variable" data-description="Coefficient based on vehicle category and intersection type" id="cr-value">C<sub>R,m,k</sub></span> × 
+                            max(1 - <span class="formula-variable" data-description="Distance from intersection (m)">|x|</span>/100, 0)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">ΔL<sub>WR,acc,i,m</sub>:</span> Rolling noise correction in decibels (dB) - the additional noise due to acceleration effects on tire-road interaction</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">C<sub>R,m,k</sub>:</span> Rolling noise coefficient - depends on:</li>
+                            <ul style="padding-left: 100px;">
+                                <li><strong>m</strong>: Vehicle category (1-4)</li>
+                                <li><strong>k</strong>: Intersection type (1: traffic light, 2: roundabout, 3: priority junction)</li>
+                            </ul>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">|x|:</span> Absolute distance from the intersection in meters</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">max(...):</span> Maximum function - ensures the correction is never negative</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">100:</span> Reference distance in meters - beyond this distance, no correction is applied</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The rolling noise correction decreases linearly with distance from the intersection, reaching zero at 100 meters. This reflects the observation that tire-road interaction noise changes with acceleration, which is highest near intersections and decreases with distance.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Propulsion Noise Correction</h5>
+                    <div class="interactive-formula">
+                        <span class="formula-component">
+                            <span class="formula-variable" data-description="Propulsion noise correction (dB)">ΔL<sub>WP,acc,i,m</sub></span> = 
+                            <span class="formula-variable" data-description="Coefficient based on vehicle category and intersection type" id="cp-value">C<sub>P,m,k</sub></span> × 
+                            max(1 - <span class="formula-variable" data-description="Distance from intersection (m)">|x|</span>/100, 0)
+                        </span>
+                    </div>
+                    
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">ΔL<sub>WP,acc,i,m</sub>:</span> Propulsion noise correction in decibels (dB) - the additional engine and drivetrain noise due to acceleration</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">C<sub>P,m,k</sub>:</span> Propulsion noise coefficient - typically larger than the rolling noise coefficient:</li>
+                            <ul style="padding-left: 100px;">
+                                <li><strong>m</strong>: Vehicle category (1-4) - heavier vehicles have higher coefficients</li>
+                                <li><strong>k</strong>: Intersection type (1: traffic light, 2: roundabout, 3: priority junction)</li>
+                            </ul>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">|x|:</span> Absolute distance from the intersection in meters</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">max(...):</span> Maximum function - ensures the correction is never negative</li>
+                            <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">100:</span> Reference distance in meters - beyond this distance, no correction is applied</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #fdebd0; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> Propulsion noise correction is generally higher than rolling noise correction, especially for heavy vehicles. Traffic light intersections (k=1) have the highest correction factors because vehicles typically come to a complete stop and then accelerate more aggressively.</p>
+                    </div>
+                </div>
+                
+                <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                    <h5 style="margin-top: 0; color: #2c3e50;">Coefficient Values by Vehicle Category and Intersection Type</h5>
+                    <div class="formula-explanation" style="margin-top: 15px;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                            <thead>
+                                <tr style="background-color: #f2f2f2;">
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Vehicle Category</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Intersection Type</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">C<sub>R,m,k</sub> (Rolling)</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">C<sub>P,m,k</sub> (Propulsion)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;" rowspan="3">Category 1<br>(Light Vehicles)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Traffic Light (k=1)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">1.7</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">3.5</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Roundabout (k=2)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">1.2</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">2.8</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Priority Junction (k=3)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">0.9</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">2.1</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;" rowspan="3">Category 3<br>(Heavy Duty)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Traffic Light (k=1)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">2.3</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">4.5</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Roundabout (k=2)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">1.8</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">3.7</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Priority Junction (k=3)</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">1.3</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">2.9</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8daef; border-radius: 5px;">
+                        <p><strong>Key Insight:</strong> The coefficient values reveal important patterns:</p>
+                        <ul>
+                            <li>Propulsion noise coefficients (C<sub>P</sub>) are consistently higher than rolling noise coefficients (C<sub>R</sub>)</li>
+                            <li>Heavy vehicles have higher coefficients than light vehicles</li>
+                            <li>Traffic lights have the highest coefficients, followed by roundabouts, then priority junctions</li>
+                        </ul>
+                        <p>These patterns reflect real-world observations about vehicle noise behavior at different types of intersections.</p>
+                    </div>
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Initialize variables
+                        const distanceSlider = document.getElementById('distance-slider');
+                        const distanceValue = document.getElementById('distance-value');
+                        const intersectionType = document.getElementById('intersection-type');
+                        const vehicleCategory = document.getElementById('vehicle-category');
+                        const rollingCorrection = document.getElementById('rolling-correction');
+                        const propulsionCorrection = document.getElementById('propulsion-correction');
+                        const crValue = document.getElementById('cr-value');
+                        const cpValue = document.getElementById('cp-value');
+                        
+                        // Coefficient values based on vehicle category and intersection type
+                        const coefficients = {
+                            'category1': {
+                                'traffic-light': { cr: 1.7, cp: 3.5 },
+                                'roundabout': { cr: 1.2, cp: 2.8 },
+                                'priority': { cr: 0.9, cp: 2.1 }
+                            },
+                            'category2': {
+                                'traffic-light': { cr: 2.0, cp: 4.0 },
+                                'roundabout': { cr: 1.5, cp: 3.2 },
+                                'priority': { cr: 1.1, cp: 2.5 }
+                            },
+                            'category3': {
+                                'traffic-light': { cr: 2.3, cp: 4.5 },
+                                'roundabout': { cr: 1.8, cp: 3.7 },
+                                'priority': { cr: 1.3, cp: 2.9 }
+                            },
+                            'category4': {
+                                'traffic-light': { cr: 1.5, cp: 3.0 },
+                                'roundabout': { cr: 1.0, cp: 2.5 },
+                                'priority': { cr: 0.7, cp: 1.8 }
+                            }
+                        };
+                        
+                        // Function to update the correction values
+                        function updateCorrections() {
+                            // Only run this if we're on the CNOSSOS tab
+                            if (document.getElementById('cnossos').style.display !== 'block') return;
+                            
+                            const distance = parseInt(distanceSlider.value);
+                            const intersectionTypeValue = intersectionType.value;
+                            const vehicleCategoryValue = vehicleCategory.value;
+                            
+                            // Get coefficients
+                            const cr = coefficients[vehicleCategoryValue][intersectionTypeValue].cr;
+                            const cp = coefficients[vehicleCategoryValue][intersectionTypeValue].cp;
+                            
+                            // Calculate correction factors
+                            const correctionFactor = Math.max(1 - distance/100, 0);
+                            const rollingCorrectionValue = (cr * correctionFactor).toFixed(1);
+                            const propulsionCorrectionValue = (cp * correctionFactor).toFixed(1);
+                            
+                            // Update display
+                            distanceValue.textContent = distance + ' m';
+                            rollingCorrection.textContent = rollingCorrectionValue + ' dB';
+                            propulsionCorrection.textContent = propulsionCorrectionValue + ' dB';
+                            crValue.textContent = 'C<sub>R,m,k</sub> = ' + cr;
+                            cpValue.textContent = 'C<sub>P,m,k</sub> = ' + cp;
+                            
+                            // Update graph (simplified version)
+                            updateGraph(distance, cr, cp);
+                        }
+                        
+                        // Function to update the graph
+                        function updateGraph(distance, cr, cp) {
+                            const graph = document.getElementById('correction-graph');
+                            graph.innerHTML = '';
+                            
+                            // Create SVG element
+                            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                            svg.setAttribute('width', '100%');
+                            svg.setAttribute('height', '100%');
+                            svg.setAttribute('viewBox', '0 0 400 200');
+                            
+                            // Create axes
+                            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            xAxis.setAttribute('x1', '50');
+                            xAxis.setAttribute('y1', '150');
+                            xAxis.setAttribute('x2', '350');
+                            xAxis.setAttribute('y2', '150');
+                            xAxis.setAttribute('stroke', '#333');
+                            xAxis.setAttribute('stroke-width', '2');
+                            
+                            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            yAxis.setAttribute('x1', '50');
+                            yAxis.setAttribute('y1', '150');
+                            yAxis.setAttribute('x2', '50');
+                            yAxis.setAttribute('y2', '50');
+                            yAxis.setAttribute('stroke', '#333');
+                            yAxis.setAttribute('stroke-width', '2');
+                            
+                            // Add axes labels
+                            const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            xLabel.setAttribute('x', '200');
+                            xLabel.setAttribute('y', '180');
+                            xLabel.setAttribute('text-anchor', 'middle');
+                            xLabel.textContent = 'Distance from Intersection (m)';
+                            
+                            const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            yLabel.setAttribute('x', '30');
+                            yLabel.setAttribute('y', '100');
+                            yLabel.setAttribute('text-anchor', 'middle');
+                            yLabel.setAttribute('transform', 'rotate(-90, 30, 100)');
+                            yLabel.textContent = 'Correction (dB)';
+                            
+                            // Create rolling noise line
+                            const rollingPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            let rollingPathData = 'M50,150 ';
+                            for (let x = 0; x <= 100; x += 5) {
+                                const correctionFactor = Math.max(1 - x/100, 0);
+                                const y = 150 - (cr * correctionFactor * 10);
+                                rollingPathData += `L${50 + x * 3},${y} `;
+                            }
+                            rollingPathData += 'L350,150';
+                            rollingPath.setAttribute('d', rollingPathData);
+                            rollingPath.setAttribute('stroke', '#3498db');
+                            rollingPath.setAttribute('stroke-width', '2');
+                            rollingPath.setAttribute('fill', 'none');
+                            
+                            // Create propulsion noise line
+                            const propulsionPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            let propulsionPathData = 'M50,150 ';
+                            for (let x = 0; x <= 100; x += 5) {
+                                const correctionFactor = Math.max(1 - x/100, 0);
+                                const y = 150 - (cp * correctionFactor * 10);
+                                propulsionPathData += `L${50 + x * 3},${y} `;
+                            }
+                            propulsionPathData += 'L350,150';
+                            propulsionPath.setAttribute('d', propulsionPathData);
+                            propulsionPath.setAttribute('stroke', '#e74c3c');
+                            propulsionPath.setAttribute('stroke-width', '2');
+                            propulsionPath.setAttribute('fill', 'none');
+                            
+                            // Create current distance marker
+                            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                            const markerX = 50 + distance * 3;
+                            const correctionFactor = Math.max(1 - distance/100, 0);
+                            const markerY = 150 - (cp * correctionFactor * 10);
+                            marker.setAttribute('cx', markerX);
+                            marker.setAttribute('cy', markerY);
+                            marker.setAttribute('r', '5');
+                            marker.setAttribute('fill', '#e74c3c');
+                            
+                            // Add legend
+                            const rollingLegend = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            rollingLegend.setAttribute('x', '300');
+                            rollingLegend.setAttribute('y', '70');
+                            rollingLegend.setAttribute('fill', '#3498db');
+                            rollingLegend.textContent = 'Rolling Noise';
+                            
+                            const propulsionLegend = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            propulsionLegend.setAttribute('x', '300');
+                            propulsionLegend.setAttribute('y', '90');
+                            propulsionLegend.setAttribute('fill', '#e74c3c');
+                            propulsionLegend.textContent = 'Propulsion Noise';
+                            
+                            // Add all elements to SVG
+                            svg.appendChild(xAxis);
+                            svg.appendChild(yAxis);
+                            svg.appendChild(xLabel);
+                            svg.appendChild(yLabel);
+                            svg.appendChild(rollingPath);
+                            svg.appendChild(propulsionPath);
+                            svg.appendChild(marker);
+                            svg.appendChild(rollingLegend);
+                            svg.appendChild(propulsionLegend);
+                            
+                            // Add SVG to graph container
+                            graph.appendChild(svg);
+                        }
+                        
+                        // Add event listeners
+                        distanceSlider.addEventListener('input', updateCorrections);
+                        intersectionType.addEventListener('change', updateCorrections);
+                        vehicleCategory.addEventListener('change', updateCorrections);
+                        
+                        // Initialize with default values
+                        updateCorrections();
+                    });
+                </script>
+                
+                <p>The correction factor decreases linearly with distance and becomes zero at distances greater than 100 meters from the intersection.</p>
+            </div>
+            
+            <div class="model-section">
+                <h4>Junction Types</h4>
+                <p>CNOSSOS distinguishes between different types of intersections:</p>
+                <ul>
+                    <li><span class="feature-highlight">k = 1:</span> Traffic light controlled crossings</li>
+                    <li><span class="feature-highlight">k = 2:</span> Roundabouts</li>
+                </ul>
+                <p>Different correction coefficients are applied based on the junction type, reflecting the different acceleration patterns typically observed at these locations.</p>
+            </div>
+            
+            <div class="model-limitations">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>Simplified spatial approach may not capture all acceleration effects accurately</li>
+                    <li>Does not apply acceleration correction factors for motorcycles (Category 4)</li>
+                    <li>Requires accurate mapping of intersection locations</li>
+                    <li>May not account for unusual traffic patterns or driver behaviors</li>
+                    <li>100-meter threshold may be too simplistic for complex urban environments</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="model-section">
+            <h4>Model Comparison Summary</h4>
+            <table class="model-comparison-table">
+                <tr>
+                    <th>Feature</th>
+                    <th>NMPB</th>
+                    <th>IMAGINE</th>
+                    <th>CNOSSOS-EU</th>
+                </tr>
+                <tr>
+                    <td>Origin</td>
+                    <td>French standard</td>
+                    <td>European research project</td>
+                    <td>Current EU standard</td>
+                </tr>
+                <tr>
+                    <td>Vehicle Categories</td>
+                    <td>2 categories</td>
+                    <td>4 categories</td>
+                    <td>4 categories</td>
+                </tr>
+                <tr>
+                    <td>Acceleration Treatment</td>
+                    <td>Discrete states</td>
+                    <td>Continuous values</td>
+                    <td>Distance-based proxy</td>
+                </tr>
+                <tr>
+                    <td>Stationary Vehicle Noise</td>
+                    <td>No (zero noise at zero speed)</td>
+                    <td>Yes (engine idling)</td>
+                    <td>Yes (depends on distance to intersection)</td>
+                </tr>
+                <tr>
+                    <td>Spectral Analysis</td>
+                    <td>Limited</td>
+                    <td>Detailed (octave bands)</td>
+                    <td>Detailed (octave bands)</td>
+                </tr>
+                <tr>
+                    <td>Computational Complexity</td>
+                    <td>Low</td>
+                    <td>High</td>
+                    <td>Medium</td>
+                </tr>
+                <tr>
+                    <td>Data Requirements</td>
+                    <td>Basic (speed, vehicle type)</td>
+                    <td>Detailed (speed, acceleration, spectral data)</td>
+                    <td>Moderate (speed, vehicle type, intersection locations)</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="model-section">
+
+        </div>
+        
+        <script>
+            // Wait for the document to be fully loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                // Set up tab functionality
+                var tabs = document.getElementsByClassName('model-tab');
+                for (var i = 0; i < tabs.length; i++) {
+                    tabs[i].addEventListener('click', function() {
+                        var modelId = this.getAttribute('data-model');
+                        showModel(modelId);
+                    });
+                }
+                
+                // Initialize with NMPB model visible
+                showModel('nmpb');
+            });
+            
+            function showModel(modelId) {
+                // Hide all models
+                document.getElementById('nmpb').style.display = 'none';
+                document.getElementById('imagine').style.display = 'none';
+                document.getElementById('cnossos').style.display = 'none';
+                
+                // Show selected model
+                document.getElementById(modelId).style.display = 'block';
+                
+                // Update active tab
+                var tabs = document.getElementsByClassName('model-tab');
+                for (var i = 0; i < tabs.length; i++) {
+                    tabs[i].classList.remove('active');
+                    if (tabs[i].getAttribute('data-model') === modelId) {
+                        tabs[i].classList.add('active');
+                    }
+                }
+                
+                // Reprocess MathJax for the newly displayed content
+                if (window.MathJax) {
+                    // Use a small timeout to ensure the content is visible first
+                    setTimeout(function() {
+                        try {
+                            MathJax.typeset && MathJax.typeset();
+                        } catch (err) {
+                            console.log('MathJax error:', err);
+                        }
+                    }, 10);
+                }
+            }
+        </script>
+    </section>
+    
+    <section id="data-aggregation">
+        <h2>Data Aggregation of Road Segments</h2>
+        <p>To determine the noise emission of a vehicle flow on a network connection, the instantaneous, single-vehicle sound power level needs to be converted to an equivalent sound pressure level averaged over a time period:</p>
+        
+        <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+            <h4 style="margin-top: 0; color: #2c3e50;">Equivalent Line Sound Power Level</h4>
+            
+            <div class="interactive-formula">
+                <span class="formula-component">
+                    <span class="formula-variable" data-description="Equivalent line sound power level (dB)">L<sub>W,line,eq</sub></span> = 
+                    <span class="formula-variable" data-description="Instantaneous sound power level of a single vehicle (dB)">L<sub>W,0</sub></span> + 
+                    10 × log<sub>10</sub>(
+                    <span class="formula-variable" data-description="Traffic flow rate (vehicles per hour)">Q</span> / 
+                    (1000 × <span class="formula-variable" data-description="Average vehicle speed (km/h)">v</span>))
+                </span>
+            </div>
+            
+            <div class="formula-explanation" style="margin-top: 15px;">
+                <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">L<sub>W,line,eq</sub>:</span> Equivalent line sound power level in decibels (dB) - represents the average noise emission over time for a road segment</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">L<sub>W,0</sub>:</span> Instantaneous sound power level of a single vehicle in decibels (dB) - calculated using one of the noise emission models (NMPB, IMAGINE, or CNOSSOS)</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">Q:</span> Traffic flow rate in vehicles per hour - represents the number of vehicles passing through the road segment</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">v:</span> Average vehicle speed in kilometers per hour (km/h)</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #3498db;">1000:</span> Scaling factor to normalize the traffic flow with respect to speed</li>
+                </ul>
+            </div>
+            
+            <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                <p><strong>Key Insight:</strong> This formula converts point-source noise (individual vehicles) into a line-source noise (traffic flow on a road segment). The logarithmic term accounts for the temporal distribution of vehicles along the road.</p>
+            </div>
+        </div>
+        
+        <p>The equivalent line sound power levels for different vehicles can be summed to calculate the average equivalent line sound power level across multiple vehicle types:</p>
+        
+        <div class="interactive-formula-container" style="margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #e74c3c;">
+            <h4 style="margin-top: 0; color: #2c3e50;">Average Equivalent Line Sound Power Level</h4>
+            
+            <div class="interactive-formula">
+                <span class="formula-component">
+                    <span class="formula-variable" data-description="Average equivalent line sound power level (dB)">L<sub>W,eq,avg</sub></span> = 
+                    10 × log<sub>10</sub>(
+                    <span class="formula-variable" data-description="Number of vehicle categories">1/N</span> × 
+                    <span class="formula-variable" data-description="Sum across all vehicle categories">∑<sub>i=1</sub><sup>N</sup></span> 
+                    10<sup><span class="formula-variable" data-description="Equivalent line sound power level for vehicle category i">L<sub>W,eq,i</sub></span>/10</sup>)
+                </span>
+            </div>
+            
+            <div class="formula-explanation" style="margin-top: 15px;">
+                <h5 style="margin-bottom: 10px; color: #34495e;">Formula Elements:</h5>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>W,eq,avg</sub>:</span> Average equivalent line sound power level in decibels (dB) - the combined noise level from all vehicle categories</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">N:</span> Number of vehicle categories being considered (e.g., light vehicles, heavy vehicles)</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">L<sub>W,eq,i</sub>:</span> Equivalent line sound power level for vehicle category i in decibels (dB)</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">∑:</span> Summation operator - adds up the energy contributions from each vehicle category</li>
+                    <li><span style="display: inline-block; width: 100px; font-weight: bold; color: #e74c3c;">10<sup>x/10</sup>:</span> Converts decibel values to energy values before summation (decibels are logarithmic units)</li>
+                </ul>
+            </div>
+            
+            <div class="formula-insight" style="margin-top: 15px; padding: 10px; background-color: #fdebd0; border-radius: 5px;">
+                <p><strong>Key Insight:</strong> This formula uses logarithmic averaging to combine noise levels from different vehicle categories. Since decibels are logarithmic units, we must convert to energy values, average them, and then convert back to decibels.</p>
+            </div>
+            
+            <div class="formula-example" style="margin-top: 15px; padding: 10px; background-color: #eafaf1; border-radius: 5px;">
+                <p><strong>Example:</strong> If light vehicles produce 70 dB and heavy vehicles produce 80 dB on a road segment, the combined noise level would be approximately 77 dB, not 75 dB (the arithmetic mean). This is because decibels are logarithmic units, and a 10 dB increase represents a 10-fold increase in sound energy.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="results">
+        <h2>Results and Analysis</h2>
+        <p>The implementation of the three noise emission models on the pNEUMA dataset yielded several key insights:</p>
+        
+        <h3>Model Comparison</h3>
+        <p>The three models showed significant differences in their noise emission predictions:</p>
+        <ul>
+            <li>NMPB model produces the lowest noise emission estimates overall</li>
+            <li>CNOSSOS model generally produces the highest noise emission estimates</li>
+            <li>Heavy vehicles consistently produce more noise than light vehicles across all models</li>
+            <li>The IMAGINE model uniquely assumes that stationary vehicles produce noise (engine idling)</li>
+        </ul>
+        
+
+    </section>
+    
+    <section id="key-findings">
+        <h2>Key Findings from Model Analysis</h2>
+        
+        <h3>Model Parameter Selection and Distribution Analysis</h3>
+        <p>Since the IMAGINE and CNOSSOS models require 3rd octave band data that wasn't available in the pNEUMA dataset, the researchers calculated both maximum and minimum parameter values to establish a range of possible noise emissions:</p>
+        
+        <div class="model-comparison" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0;">
+            <div class="model-card" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column;">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0;">NMPB Model Distribution</h3>
+                <div class="image-container" style="margin: 15px 0; flex-grow: 0;">
+                    <img src="../assets/noise emissions project/NMPB model.png" alt="NMPB model noise distribution" style="width: 100%; height: auto; border-radius: 4px;">
+                </div>
+                <p style="font-weight: 600; margin-bottom: 10px; color: #34495e;">Key observations:</p>
+                <ul style="padding-left: 20px; margin-top: 0; flex-grow: 1;">
+                    <li>Heavy vehicles produce noise in the range of 74-83 dB</li>
+                    <li>Light vehicles produce noise in the range of 62-78 dB</li>
+                    <li>Three distinct clusters appear in both categories due to the discrete acceleration states (accelerating, steady, decelerating)</li>
+                    <li>Higher speeds correlate with higher noise emissions</li>
+                </ul>
+            </div>
+            
+            <div class="model-card" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column;">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0;">IMAGINE Model Distribution</h3>
+                <div class="image-container" style="margin: 15px 0; flex-grow: 0;">
+                    <img src="../assets/noise emissions project/IMAGINE model.png" alt="IMAGINE model noise distribution" style="width: 100%; height: auto; border-radius: 4px;">
+                </div>
+                <p style="font-weight: 600; margin-bottom: 10px; color: #34495e;">Key observations:</p>
+                <ul style="padding-left: 20px; margin-top: 0; flex-grow: 1;">
+                    <li>Overall noise range is 73-96 dB across all vehicle types</li>
+                    <li>High peaks appear at specific noise levels due to stationary vehicles</li>
+                    <li>Distribution follows multiple normal distributions when stationary vehicles are excluded</li>
+                    <li>Model assumes idling engines produce noise even when vehicles aren't moving</li>
+                    <li>More uniform distribution due to continuous acceleration values</li>
+                </ul>
+            </div>
+            
+            <div class="model-card" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column;">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0;">CNOSSOS Model Distribution</h3>
+                <div class="image-container" style="margin: 15px 0; flex-grow: 0;">
+                    <img src="../assets/noise emissions project/CNOSSOS model.png" alt="CNOSSOS model noise distribution" style="width: 100%; height: auto; border-radius: 4px;">
+                </div>
+                <p style="font-weight: 600; margin-bottom: 10px; color: #34495e;">Key observations:</p>
+                <ul style="padding-left: 20px; margin-top: 0; flex-grow: 1;">
+                    <li>No high peaks in the distribution unlike the IMAGINE model</li>
+                    <li>Acceleration correction based on distance to intersections creates smoother distribution</li>
+                    <li>Heavy and medium-heavy vehicles produce higher noise emissions than motorcycles and light vehicles</li>
+                    <li>Stationary vehicles at different locations produce different noise levels</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3>Model Comparison Analysis</h3>
+        <div class="image-container">
+            <img src="../assets/noise emissions project/Comparisons between 3 models.png" alt="Comparison between 3 models">
+            <div class="caption">Figure 8: Direct comparison of noise emission distributions across the three models by vehicle category</div>
+        </div>
+        <p>The direct comparison of the three models reveals:</p>
+        <ul>
+            <li>For most vehicle categories, CNOSSOS predicts higher noise levels than IMAGINE, which predicts higher levels than NMPB</li>
+            <li>The exception is motorcycles, where CNOSSOS predicts lower values than IMAGINE because it doesn't apply an acceleration correction factor for this category</li>
+            <li>The models show consistent patterns in relative noise levels between vehicle types (heavy vehicles > medium vehicles > motorcycles > light vehicles)</li>
+        </ul>
+        
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 40px;">Equivalent Line Sound Power Analysis</h3>
+        <div class="sound-power-analysis" style="background-color: #f8f9fa; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0;">
+            <div class="image-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 15px;">
+                <div style="text-align: center;">
+                    <img src="../assets/noise emissions project/emission-speed-flow(bus).png" alt="Bus equivalent line sound power" style="width: 100%; max-width: 450px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">Bus equivalent line sound power vs. speed and flow</div>
+                </div>
+                <div style="text-align: center;">
+                    <img src="../assets/noise emissions project/emission-speed-flow(Taxi).png" alt="Taxi equivalent line sound power" style="width: 100%; max-width: 450px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">Taxi equivalent line sound power vs. speed and flow</div>
+                </div>
+            </div>
+            <div class="caption" style="text-align: center; font-weight: 600; margin: 15px 0; color: #34495e;">Figure 9: Analysis of equivalent line sound power in relation to vehicle speed and flow</div>
+            
+            <div class="analysis-content" style="margin-top: 25px;">
+                <p style="font-weight: 600; color: #34495e;">These graphs demonstrate a counterintuitive relationship between speed and noise:</p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>As speed increases, the equivalent line sound power (L<sub>W,line,eq</sub>) decreases</li>
+                    <li>This occurs because slower vehicles are heard for longer periods, increasing their equivalent sound power level</li>
+                    <li>Two distinct curves appear in each graph, showing that as traffic flow (Q) increases, the equivalent line sound power also increases</li>
+                    <li>This relationship is critical for understanding noise impacts in congested urban areas</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 40px;">Road Segment Noise Analysis</h3>
+        <div class="road-segment-analysis" style="background-color: #f8f9fa; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0;">
+            <div class="image-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 15px;">
+                <div style="text-align: center;">
+                    <img src="../assets/noise emissions project/first30s(up).png" alt="Road segment noise (east to west)" style="width: 100%; max-width: 450px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">Direction: east to west</div>
+                </div>
+                <div style="text-align: center;">
+                    <img src="../assets/noise emissions project/first30s(down).png" alt="Road segment noise (west to east)" style="width: 100%; max-width: 450px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">Direction: west to east</div>
+                </div>
+            </div>
+            <div class="caption" style="text-align: center; font-weight: 600; margin: 15px 0; color: #34495e;">Figure 10: Average noise emission in road segments over one traffic light cycle (90 seconds)</div>
+            
+            <div class="analysis-content" style="margin-top: 25px;">
+                <p style="font-weight: 600; color: #34495e;">The analysis of road segment noise reveals:</p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>CNOSSOS consistently calculates higher noise values for road segments than IMAGINE</li>
+                    <li>Segments in the western part of the road produce less noise because vehicles travel at higher speeds and are heard for shorter periods</li>
+                    <li>Noise emissions vary significantly based on segment location relative to intersections</li>
+                    <li>Road segments show clear periodicity in noise emissions that correlate with traffic light cycles</li>
+                </ul>
+            </div>
+            
+            <div class="periodicity-analysis" style="margin-top: 30px;">
+                <div class="image-container" style="text-align: center; margin: 20px 0;">
+                    <img src="../assets/noise emissions project/t vs noise.png" alt="Time vs noise emissions" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">Figure 11: Periodicity of noise emissions in road segments over multiple traffic light cycles</div>
+                </div>
+                
+                <p style="font-weight: 600; color: #34495e; margin-top: 20px;">The time-based analysis of two road segments shows:</p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Each segment has a unique noise pattern within a 90-second traffic light cycle</li>
+                    <li>These patterns repeat consistently across multiple cycles</li>
+                    <li>Road 1 shows higher noise at the beginning (vehicles still moving) and end (light turns green) of each cycle</li>
+                    <li>Road 2 shows higher noise in the middle and end of each cycle due to vehicles slowing down and then accelerating</li>
+                    <li>This periodicity is crucial for understanding temporal patterns of urban noise exposure</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 40px;">Noise Distribution in Athens City Map</h3>
+        <div class="athens-map-analysis" style="background-color: #f8f9fa; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0;">
+            <p style="margin-top: 0;">To understand the spatial distribution of noise emissions in a real urban environment, the NMPB model was applied to create heat maps of noise emissions in Athens city center at different time points during a traffic light cycle:</p>
+            
+            <div class="image-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
+                <div class="map-image" style="text-align: center;">
+                    <img src="../assets/noise emissions project/1s.png" alt="Noise distribution at 1s" style="width: 100%; max-width: 350px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">1 second: Beginning of intersection cycle</div>
+                </div>
+                <div class="map-image" style="text-align: center;">
+                    <img src="../assets/noise emissions project/11s(1).png" alt="Noise distribution at 11s" style="width: 100%; max-width: 350px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">11 seconds: Vehicles begin moving in east direction</div>
+                </div>
+                <div class="map-image" style="text-align: center;">
+                    <img src="../assets/noise emissions project/21s.png" alt="Noise distribution at 21s" style="width: 100%; max-width: 350px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">21 seconds: All vehicles in east direction moving</div>
+                </div>
+                <div class="map-image" style="text-align: center;">
+                    <img src="../assets/noise emissions project/31s(1).png" alt="Noise distribution at 31s" style="width: 100%; max-width: 350px; height: auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    <div class="caption" style="margin-top: 10px; font-style: italic; color: #555;">31 seconds: Light turning red again</div>
+                </div>
+            </div>
+            <div class="caption" style="text-align: center; font-weight: 600; margin: 15px 0; color: #34495e;">Figure 12: The noise emission distribution in Athens city map at different time points</div>
+            
+            <div class="analysis-content" style="margin-top: 25px;">
+                <p style="font-weight: 600; color: #34495e;">Analysis of these heat maps reveals:</p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>At the beginning of the intersection cycle, queues form in east and south directions while north direction vehicles move freely</li>
+                    <li>Buses and motorcycles in dedicated lanes create noise even during red lights</li>
+                    <li>Vehicles turning at intersections produce less noise due to deceleration</li>
+                    <li>After 10 seconds, vehicles in the east direction begin moving, with first movers creating higher noise emissions</li>
+                    <li>After 20 seconds, all vehicles in the east direction produce noise, with heavy vehicles creating more emissions</li>
+                    <li>After 30 seconds, the light turns red again, and vehicles that haven't passed the intersection stop producing noise</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="conclusion">
+        <h2>Conclusion</h2>
+        
+        <div class="conclusion-container" style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 20px;">
+            <div class="conclusion-main" style="flex: 2; min-width: 300px;">
+                <p>This research project leveraged high-resolution drone-collected vehicle trajectory data to advance urban noise emission modeling through rigorous mathematical formulation and comparative analysis. Our comprehensive evaluation of the NMPB, IMAGINE, and CNOSSOS-EU models revealed:</p>
+                
+                <ul>
+                    <li><strong>Mathematical Formulation Differences:</strong> Each model employs distinct approaches to acceleration handling—from the NMPB's discrete states to CNOSSOS-EU's innovative distance-based correction factors</li>
+                    <li><strong>Acceleration Treatment Impact:</strong> The continuous acceleration treatment in IMAGINE and the distance-based approach in CNOSSOS provide more nuanced noise predictions in complex urban environments</li>
+                    <li><strong>Spatial-Temporal Patterns:</strong> Noise emission patterns at intersections follow predictable cycles corresponding to traffic signal phases, creating identifiable acoustic signatures</li>
+                    <li><strong>Vehicle Category Influence:</strong> Heavy vehicles consistently generate 8-15 dB higher noise emissions than light vehicles across all models, with consistent hierarchical patterns</li>
+                    <li><strong>Counter-intuitive Speed-Noise Relationship:</strong> While individual faster vehicles produce higher instantaneous noise levels, slower-moving traffic contributes more to equivalent line sound power levels due to extended exposure duration</li>
+                </ul>
+                
+                <p>The integration of precise mathematical models with high-resolution trajectory data demonstrates significant potential for next-generation urban acoustic planning. This approach enables more accurate noise mapping, targeted mitigation strategies, and evidence-based policy development for healthier urban soundscapes.</p>
+            </div>
+            
+            <div class="conclusion-future" style="flex: 1; min-width: 300px; background-color: #f8f9fa; border-left: 4px solid #4a6fa5; padding: 15px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">Future Research Directions</h3>
+                <ul>
+                    <li>Validation of model predictions against ground-truth acoustic measurements</li>
+                    <li>Integration of building geometry and urban canyon effects into emission calculations</li>
+                    <li>Development of hybrid models that leverage the strengths of each approach</li>
+                    <li>Machine learning applications for real-time noise prediction based on traffic patterns</li>
+                    <li>Exploration of noise reduction scenarios through traffic management optimization</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <section class="references" style="margin-top: 50px; padding: 30px; background-color: #f9f9f9; border-top: 1px solid #e0e0e0;">
+        <h2>References</h2>
+        
+        <div class="reference-container" style="max-width: 900px; margin: 0 auto;">
+            <ol style="padding-left: 20px; line-height: 1.6;">
+                <li>Peeters, B., & van Blokland, G. (2007). The Noise Emission Model For European Road Traffic. <em>Improved Methods for the Assessment of the Generic Impact of Noise in the Environment (IMAGINE)</em>, Deliverable 11 of the IMAGINE project.</li>
+                
+                <li>Salomons, E., van Leeuwen, H., de Jong, R., & Schram, C. (2009). Sound propagation modelling in action planning. <em>Proceedings of Euronoise 2009</em>, Edinburgh, UK.</li>
+                
+                <li>Kephalopoulos, S., Paviotti, M., & Anfosso-Lédée, F. (2012). Common Noise Assessment Methods in Europe (CNOSSOS-EU). <em>EUR 25379 EN. Luxembourg: Publications Office of the European Union</em>, 180 pp.</li>
+                
+                <li>Watts, G. R. (2005). Harmonoise prediction model for road traffic noise. <em>TRL Published Project Report</em>, PPR 034.</li>
+                
+                <li>Jonasson, H. G. (2007). Acoustical source modelling of road vehicles. <em>Acta Acustica united with Acustica</em>, 93(2), 173-184.</li>
+                
+                <li>Barrigón Morillas, J. M., Gómez Escobar, V., Méndez Sierra, J. A., Vílchez-Gómez, R., & Trujillo Carmona, J. (2002). An environmental noise study in the city of Cáceres, Spain. <em>Applied Acoustics</em>, 63(10), 1061-1070.</li>
+                
+                <li>Garg, N., & Maji, S. (2014). A critical review of principal traffic noise models: Strategies and implications. <em>Environmental Impact Assessment Review</em>, 46, 68-81.</li>
+                
+                <li>Steele, C. (2001). A critical review of some traffic noise prediction models. <em>Applied Acoustics</em>, 62(3), 271-287.</li>
+                
+                <li>Quartieri, J., Mastorakis, N. E., Iannone, G., Guarnaccia, C., D'Ambrosio, S., Troisi, A., & Lenza, T. L. L. (2009). A review of traffic noise predictive models. <em>Recent Advances in Applied and Theoretical Mechanics</em>, 72-80.</li>
+                
+                <li>Dragos, P., Gheorghe, S., & Dragos, M. (2015). Noise prediction software—A comparative study of IMMI, NMPB, CNOSSOS. <em>Proceedings of the 22nd International Congress on Sound and Vibration</em>, Florence, Italy.</li>
+            </ol>
+        </div>
+    </section>
+    </section>
+</body>
+</html>
