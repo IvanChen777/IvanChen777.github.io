@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOT Trajectory Visualization with Road Map</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- D3.js library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Animation enhancement script -->
+    <script src="mot_animation_fix.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: white;
+            padding: 0 40px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .visualization-container {
+            width: 800px;
+            height: 500px;
+            margin: 0 auto;
+            position: relative;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .road {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .intersection {
+            fill: #555;
+        }
+        .trajectory {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-opacity: 0.85;
+        }
+        .trajectory-point {
+            fill: #fff;
+            stroke-width: 1.5;
+        }
+        .object-label {
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px white;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px 5px 10px;
+            position: relative;
+            z-index: 5;
+        }
+        .color-box {
+            width: 20px;
+            height: 10px;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+        .legend-icon {
+            margin-right: 5px;
+            display: inline-block;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        .legend span {
+            margin-left: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
+        }
+        .control-group {
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+            z-index: 100;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .description {
+            max-width: 800px;
+            margin: 25px auto;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        .debug-console {
+            display: none;
+            margin: 20px auto;
+            max-width: 800px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        #completion-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 15px 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #road-following-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            padding: 8px 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #2c3e50;
+            z-index: 100;
+        }
+        
+        #road-size-value {
+            display: inline-block;
+            width: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Finding Carrots!</h1>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="object-count">Number of Rabbits:</label>
+            <input type="number" id="object-count" min="1" max="10" value="5">
+            <button id="update-btn">Update</button>
+        </div>
+        <div class="control-group">
+            <button id="play-btn">Play Animation</button>
+            <button id="reset-btn">Reset</button>
+        </div>
+        <div class="control-group">
+            <label for="layout-selector">Road Layout:</label>
+            <select id="layout-selector">
+                <option value="0">Grid Layout</option>
+                <option value="1">Radial Layout</option>
+                <option value="2">Organic Layout</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="road-size">Road Size:</label>
+            <input type="range" id="road-size" min="0.5" max="2.0" step="0.1" value="1.0">
+            <span id="road-size-value">1.0</span>
+            <button id="apply-size-btn">Apply Size</button>
+        </div>
+    </div>
+    
+    <div class="visualization-container">
+        <svg id="visualization"></svg>
+        <div id="completion-message"></div>
+        <div id="road-following-stats" style="display: none;">
+            <strong>Road Following:</strong> <span id="road-following-count">0/0</span> objects (<span id="road-following-percentage">0.0%</span>)
+        </div>
+    </div>
+    
+    <div class="legend" id="legend"></div>
+    
+    <div class="debug-console">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <h4 style="margin: 0;">Debug Console</h4>
+            <label><input type="checkbox" id="debug-toggle"> Show Debug Info</label>
+        </div>
+        <div id="debug-info" style="max-height: 150px; overflow-y: auto;"></div>
+    </div>
+    
+    <div class="description">
+        <h3>Game Explanation</h3>
+        <p>Welcome to Finding Carrots! Help the rabbits find their way to the carrots:</p>
+        <ul>
+            <li><strong>Number of Rabbits:</strong> Choose how many hungry rabbits will search for carrots (1-10)</li>
+            <li><strong>Play Animation:</strong> Start the rabbits' journey to find their carrots</li>
+            <li><strong>Reset:</strong> Return all rabbits to their starting positions</li>
+            <li><strong>Road Layout:</strong> Change the pattern of roads the rabbits will follow</li>
+            <li><strong>Road Size:</strong> Adjust how wide the roads are for the rabbits to travel on</li>
+            <li><strong>Apply Size:</strong> Update the road width after changing the size slider</li>
+        </ul>
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            width: 800,
+            height: 500,
+            margin: { top: 50, right: 50, bottom: 50, left: 50 },
+            animationDuration: 20000, // 20 seconds for slower, more user-friendly motion
+            objectColors: [
+                "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+                "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
+                "#aec7e8", "#ffbb78", "#98df8a", "#ff9896", "#c5b0d5",
+                "#c49c94", "#f7b6d2", "#c7c7c7", "#dbdb8d", "#9edae5",
+                "#b2df8a", "#fb9a99"
+            ],
+            roadColors: {
+                primary: "#333",
+                secondary: "#666",
+                tertiary: "#999"
+            },
+            roadFollowingThreshold: 15 // Distance in pixels to consider a point near a road
+        };
+
+        // Road network layouts
+        const roadLayouts = [
+            // Layout 1: Grid
+            {
+                name: "Grid Layout",
+                // Primary roads (main arteries)
+                primaryRoads: [
+                    { x1: 50, y1: 50, x2: 750, y2: 50 },    // Horizontal top
+                    { x1: 50, y1: 450, x2: 750, y2: 450 },  // Horizontal bottom
+                    { x1: 50, y1: 50, x2: 50, y2: 450 },    // Vertical left
+                    { x1: 750, y1: 50, x2: 750, y2: 450 }   // Vertical right
+                ],
+                // Secondary roads (medium streets)
+                secondaryRoads: [
+                    { x1: 50, y1: 250, x2: 750, y2: 250 },   // Horizontal middle
+                    { x1: 400, y1: 50, x2: 400, y2: 450 },   // Vertical middle
+                    { x1: 200, y1: 50, x2: 200, y2: 450 },   // Vertical quarter
+                    { x1: 600, y1: 50, x2: 600, y2: 450 }    // Vertical three-quarter
+                ],
+                // Tertiary roads (smaller streets)
+                tertiaryRoads: [
+                    { x1: 50, y1: 150, x2: 750, y2: 150 },   // Horizontal quarter
+                    { x1: 50, y1: 350, x2: 750, y2: 350 },   // Horizontal three-quarter
+                    { x1: 125, y1: 50, x2: 125, y2: 450 },   // Vertical 1/8
+                    { x1: 275, y1: 50, x2: 275, y2: 450 },   // Vertical 3/8
+                    { x1: 525, y1: 50, x2: 525, y2: 450 },   // Vertical 5/8
+                    { x1: 675, y1: 50, x2: 675, y2: 450 }    // Vertical 7/8
+                ],
+                // Intersections
+                intersections: [
+                    // Major intersections (at primary road crossings)
+                    { x: 50, y: 50, r: 8 },     // Top-left
+                    { x: 400, y: 50, r: 8 },    // Top-middle
+                    { x: 750, y: 50, r: 8 },    // Top-right
+                    { x: 50, y: 250, r: 8 },    // Middle-left
+                    { x: 400, y: 250, r: 8 },   // Center
+                    { x: 750, y: 250, r: 8 },   // Middle-right
+                    { x: 50, y: 450, r: 8 },    // Bottom-left
+                    { x: 400, y: 450, r: 8 },   // Bottom-middle
+                    { x: 750, y: 450, r: 8 },   // Bottom-right
+                    
+                    // Secondary intersections
+                    { x: 200, y: 50, r: 6 },    // Secondary intersections
+                    { x: 600, y: 50, r: 6 },
+                    { x: 200, y: 250, r: 6 },
+                    { x: 600, y: 250, r: 6 },
+                    { x: 200, y: 450, r: 6 },
+                    { x: 600, y: 450, r: 6 },
+                    { x: 50, y: 150, r: 6 },
+                    { x: 400, y: 150, r: 6 },
+                    { x: 750, y: 150, r: 6 },
+                    { x: 50, y: 350, r: 6 },
+                    { x: 400, y: 350, r: 6 },
+                    { x: 750, y: 350, r: 6 },
+                    
+                    // Tertiary intersections
+                    { x: 125, y: 50, r: 5 },   // Various minor intersections
+                    { x: 275, y: 50, r: 5 },
+                    { x: 525, y: 50, r: 5 },
+                    { x: 675, y: 50, r: 5 },
+                    { x: 125, y: 150, r: 5 },
+                    { x: 275, y: 150, r: 5 },
+                    { x: 525, y: 150, r: 5 },
+                    { x: 675, y: 150, r: 5 },
+                    { x: 125, y: 250, r: 5 },
+                    { x: 275, y: 250, r: 5 },
+                    { x: 525, y: 250, r: 5 },
+                    { x: 675, y: 250, r: 5 },
+                    { x: 125, y: 350, r: 5 },
+                    { x: 275, y: 350, r: 5 },
+                    { x: 525, y: 350, r: 5 },
+                    { x: 675, y: 350, r: 5 },
+                    { x: 125, y: 450, r: 5 },
+                    { x: 275, y: 450, r: 5 },
+                    { x: 525, y: 450, r: 5 },
+                    { x: 675, y: 450, r: 5 }
+                ]
+            },
+            // Layout 2: Radial
+            {
+                name: "Radial Layout",
+                primaryRoads: [
+                    // Outer ring
+                    { x1: 400, y1: 50, x2: 700, y2: 250 },
+                    { x1: 700, y1: 250, x2: 400, y2: 450 },
+                    { x1: 400, y1: 450, x2: 100, y2: 250 },
+                    { x1: 100, y1: 250, x2: 400, y2: 50 }
+                ],
+                secondaryRoads: [
+                    // Inner ring
+                    { x1: 400, y1: 150, x2: 550, y2: 250 },
+                    { x1: 550, y1: 250, x2: 400, y2: 350 },
+                    { x1: 400, y1: 350, x2: 250, y2: 250 },
+                    { x1: 250, y1: 250, x2: 400, y2: 150 },
+                    // Spokes
+                    { x1: 400, y1: 50, x2: 400, y2: 450 },
+                    { x1: 100, y1: 250, x2: 700, y2: 250 }
+                ],
+                tertiaryRoads: [
+                    // Diagonal spokes
+                    { x1: 175, y1: 125, x2: 625, y2: 375 },
+                    { x1: 175, y1: 375, x2: 625, y2: 125 }
+                ],
+                intersections: [
+                    // Center
+                    { x: 400, y: 250, r: 8 },
+                    // Main compass points
+                    { x: 400, y: 50, r: 7 },
+                    { x: 700, y: 250, r: 7 },
+                    { x: 400, y: 450, r: 7 },
+                    { x: 100, y: 250, r: 7 },
+                    // Inner ring intersections
+                    { x: 400, y: 150, r: 6 },
+                    { x: 550, y: 250, r: 6 },
+                    { x: 400, y: 350, r: 6 },
+                    { x: 250, y: 250, r: 6 },
+                    // Diagonal intersections
+                    { x: 175, y: 125, r: 5 },
+                    { x: 625, y: 375, r: 5 },
+                    { x: 175, y: 375, r: 5 },
+                    { x: 625, y: 125, r: 5 },
+                    // Other intersections
+                    { x: 325, y: 175, r: 4 },
+                    { x: 475, y: 175, r: 4 },
+                    { x: 325, y: 325, r: 4 },
+                    { x: 475, y: 325, r: 4 }
+                ]
+            },
+            // Layout 3: Organic
+            {
+                name: "Organic Layout",
+                primaryRoads: [
+                    // Main curved road
+                    { x1: 50, y1: 250, x2: 200, y2: 150 },
+                    { x1: 200, y1: 150, x2: 400, y2: 200 },
+                    { x1: 400, y1: 200, x2: 600, y2: 300 },
+                    { x1: 600, y1: 300, x2: 750, y2: 250 },
+                    // Secondary main road
+                    { x1: 200, y1: 400, x2: 400, y2: 350 },
+                    { x1: 400, y1: 350, x2: 600, y2: 400 }
+                ],
+                secondaryRoads: [
+                    // Connecting roads
+                    { x1: 200, y1: 150, x2: 150, y2: 50 },
+                    { x1: 400, y1: 200, x2: 400, y2: 50 },
+                    { x1: 600, y1: 300, x2: 650, y2: 150 },
+                    { x1: 200, y1: 400, x2: 150, y2: 450 },
+                    { x1: 400, y1: 350, x2: 400, y2: 450 },
+                    { x1: 600, y1: 400, x2: 650, y2: 450 },
+                    // Cross connections
+                    { x1: 300, y1: 175, x2: 300, y2: 375 },
+                    { x1: 500, y1: 250, x2: 500, y2: 400 }
+                ],
+                tertiaryRoads: [
+                    // Small local roads
+                    { x1: 100, y1: 150, x2: 150, y2: 200 },
+                    { x1: 150, y1: 200, x2: 100, y2: 300 },
+                    { x1: 100, y1: 300, x2: 150, y2: 350 },
+                    { x1: 700, y1: 200, x2: 650, y2: 250 },
+                    { x1: 650, y1: 250, x2: 700, y2: 350 },
+                    { x1: 700, y1: 350, x2: 650, y2: 400 },
+                    { x1: 250, y1: 100, x2: 350, y2: 150 },
+                    { x1: 450, y1: 150, x2: 550, y2: 100 },
+                    { x1: 250, y1: 400, x2: 350, y2: 450 },
+                    { x1: 450, y1: 450, x2: 550, y2: 400 }
+                ],
+                intersections: [
+                    // Primary intersections
+                    { x: 200, y: 150, r: 7 },
+                    { x: 400, y: 200, r: 7 },
+                    { x: 600, y: 300, r: 7 },
+                    { x: 200, y: 400, r: 7 },
+                    { x: 400, y: 350, r: 7 },
+                    { x: 600, y: 400, r: 7 },
+                    // Secondary intersections
+                    { x: 150, y: 50, r: 5 },
+                    { x: 400, y: 50, r: 5 },
+                    { x: 650, y: 150, r: 5 },
+                    { x: 150, y: 450, r: 5 },
+                    { x: 400, y: 450, r: 5 },
+                    { x: 650, y: 450, r: 5 },
+                    { x: 300, y: 175, r: 5 },
+                    { x: 300, y: 375, r: 5 },
+                    { x: 500, y: 250, r: 5 },
+                    { x: 500, y: 400, r: 5 },
+                    // Tertiary intersections
+                    { x: 100, y: 150, r: 4 },
+                    { x: 150, y: 200, r: 4 },
+                    { x: 100, y: 300, r: 4 },
+                    { x: 150, y: 350, r: 4 },
+                    { x: 700, y: 200, r: 4 },
+                    { x: 650, y: 250, r: 4 },
+                    { x: 700, y: 350, r: 4 },
+                    { x: 650, y: 400, r: 4 },
+                    { x: 250, y: 100, r: 4 },
+                    { x: 350, y: 150, r: 4 },
+                    { x: 450, y: 150, r: 4 },
+                    { x: 550, y: 100, r: 4 },
+                    { x: 250, y: 400, r: 4 },
+                    { x: 350, y: 450, r: 4 },
+                    { x: 450, y: 450, r: 4 },
+                    { x: 550, y: 400, r: 4 }
+                ]
+            }
+        ];
+
+        // Global variables
+        let currentLayoutIndex = 0;
+        let roadNetwork = roadLayouts[currentLayoutIndex];
+        let roadMapScale = 1.0;
+        let roadFollowingStats = { total: 0, following: 0, percentage: 0 };
+        let currentTrajectoryData = [];
+        let animationId = null;
+        let animationStartTime = null;
+        
+        // Helper function to calculate distance from a point to a line segment
+        function distanceToLineSegment(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const len_sq = C * C + D * D;
+            let param = -1;
+            
+            if (len_sq !== 0) { // in case of 0 length line
+                param = dot / len_sq;
+            }
+            
+            let xx, yy;
+            
+            if (param < 0) {
+                xx = x1;
+                yy = y1;
+            } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+            
+            const dx = px - xx;
+            const dy = py - yy;
+            
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        // Helper function to project a point onto a line segment and return the parameter t
+        // where t=0 is the start point and t=1 is the end point
+        function projectPointOnLineSegment(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const len_sq = C * C + D * D;
+            let param = -1;
+            
+            if (len_sq !== 0) {
+                param = dot / len_sq;
+            }
+            
+            // Clamp parameter to [0,1] for line segment
+            return Math.max(0, Math.min(1, param));
+        }
+        
+        // Check if a point is near any road segment
+        function isPointNearRoad(x, y) {
+            const threshold = 15 * roadMapScale; // Adjust threshold based on road scale
+            
+            // Check primary roads
+            for (const road of roadNetwork.primaryRoads) {
+                if (distanceToLineSegment(x, y, road.x1, road.y1, road.x2, road.y2) < threshold) {
+                    return true;
+                }
+            }
+            
+            // Check secondary roads
+            for (const road of roadNetwork.secondaryRoads) {
+                if (distanceToLineSegment(x, y, road.x1, road.y1, road.x2, road.y2) < threshold) {
+                    return true;
+                }
+            }
+            
+            // Check tertiary roads
+            for (const road of roadNetwork.tertiaryRoads) {
+                if (distanceToLineSegment(x, y, road.x1, road.y1, road.x2, road.y2) < threshold) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Calculate road following statistics
+        function calculateRoadFollowingStats() {
+            if (currentTrajectoryData.length === 0) return;
+            
+            let totalFollowing = 0;
+            
+            for (const trajectory of currentTrajectoryData) {
+                // Count points near road, giving more weight to middle points
+                // This prevents trajectories that just cross roads from being counted as "following"
+                let pointsNearRoad = 0;
+                let totalPoints = trajectory.points.length;
+                
+                // Skip first and last point in calculation to focus on the path itself
+                const pointsToCheck = totalPoints <= 3 ? trajectory.points : trajectory.points.slice(1, -1);
+                const adjustedTotal = pointsToCheck.length;
+                
+                // Check each point
+                for (const point of pointsToCheck) {
+                    if (isPointNearRoad(point.x, point.y)) {
+                        pointsNearRoad++;
+                    }
+                }
+                
+                // Calculate percentage based on middle points
+                const followingPercentage = adjustedTotal > 0 ? 
+                    (pointsNearRoad / adjustedTotal) * 100 : 0;
+                
+                // Consider an object to be "following the road" if at least 75% of its points are near roads
+                // Higher threshold for more accuracy
+                if (followingPercentage >= 75) {
+                    totalFollowing++;
+                    trajectory.isFollowingRoad = true;
+                } else {
+                    trajectory.isFollowingRoad = false;
+                }
+                
+                // Store the following percentage on the trajectory object
+                trajectory.followingPercentage = followingPercentage;
+            }
+            
+            // Update the stats display
+            const followingPercentage = currentTrajectoryData.length > 0 ?
+                (totalFollowing / currentTrajectoryData.length) * 100 : 0;
+            
+            document.getElementById('road-following-percentage').textContent = 
+                `${followingPercentage.toFixed(1)}%`;
+            document.getElementById('road-following-count').textContent = 
+                `${totalFollowing} / ${currentTrajectoryData.length}`;
+            
+            debugLog("Calculated road following stats", { 
+                following: totalFollowing, 
+                total: currentTrajectoryData.length,
+                percentage: followingPercentage
+            });
+        }
+        
+        // Debug logging function
+        function debugLog(message, data = null) {
+            const debugToggle = document.getElementById('debug-toggle');
+            if (debugToggle && debugToggle.checked) {
+                const debugInfo = document.getElementById('debug-info');
+                const timestamp = new Date().toLocaleTimeString();
+                const logItem = document.createElement('div');
+                logItem.innerHTML = `<span style="color:#888">[${timestamp}]</span> ${message}`;
+                if (data) {
+                    logItem.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+                debugInfo.appendChild(logItem);
+                debugInfo.scrollTop = debugInfo.scrollHeight;
+                console.log(message, data || '');
+            }
+        }
+        
+        // Store river locations for collision detection
+        let riverSegments = [];
+        
+        // Cache for safe carrot positions to prevent movement during animation
+        let safeCarrotPositions = {};
+        
+        // Function to check if a point is in a river
+        function isPointInRiver(x, y) {
+            for (const river of riverSegments) {
+                // Calculate distance from point to line segment (river)
+                const dx = river.x2 - river.x1;
+                const dy = river.y2 - river.y1;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                // Normalize direction vector
+                const dirX = dx / length;
+                const dirY = dy / length;
+                
+                // Vector from line start to point
+                const vx = x - river.x1;
+                const vy = y - river.y1;
+                
+                // Project point onto line
+                const dot = vx * dirX + vy * dirY;
+                
+                // Get closest point on line segment
+                let closestX, closestY;
+                
+                if (dot < 0) {
+                    // Point is before start of line
+                    closestX = river.x1;
+                    closestY = river.y1;
+                } else if (dot > length) {
+                    // Point is after end of line
+                    closestX = river.x2;
+                    closestY = river.y2;
+                } else {
+                    // Point is within line segment
+                    closestX = river.x1 + dirX * dot;
+                    closestY = river.y1 + dirY * dot;
+                }
+                
+                // Calculate distance from point to closest point on line
+                const distance = Math.sqrt(
+                    Math.pow(x - closestX, 2) + 
+                    Math.pow(y - closestY, 2)
+                );
+                
+                // Check if point is within river width
+                if (distance < river.width / 2) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Function to find a safe position for carrot (not in river)
+        function findSafeCarrotPosition(endPoint, trajectoryId) {
+            // Check if we already have a cached safe position for this trajectory
+            const cacheKey = `${trajectoryId}-${endPoint.x.toFixed(2)}-${endPoint.y.toFixed(2)}`;
+            if (safeCarrotPositions[cacheKey]) {
+                return safeCarrotPositions[cacheKey];
+            }
+            
+            // Try the original position first
+            if (!isPointInRiver(endPoint.x, endPoint.y)) {
+                // Cache this position
+                safeCarrotPositions[cacheKey] = endPoint;
+                return endPoint;
+            }
+            
+            // If original position is in a river, try positions around it
+            const searchRadius = 30;
+            const attempts = 20;
+            
+            for (let i = 0; i < attempts; i++) {
+                // Try random positions within search radius
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * searchRadius;
+                const newX = endPoint.x + Math.cos(angle) * distance;
+                const newY = endPoint.y + Math.sin(angle) * distance;
+                
+                // Check if this position is safe
+                if (!isPointInRiver(newX, newY)) {
+                    const safePosition = { x: newX, y: newY };
+                    // Cache this position
+                    safeCarrotPositions[cacheKey] = safePosition;
+                    return safePosition;
+                }
+            }
+            
+            // If all attempts fail, move the carrot further away from the river
+            const angle = Math.random() * Math.PI * 2;
+            const safePosition = {
+                x: endPoint.x + Math.cos(angle) * (searchRadius + 20),
+                y: endPoint.y + Math.sin(angle) * (searchRadius + 20)
+            };
+            
+            // Cache this position
+            safeCarrotPositions[cacheKey] = safePosition;
+            return safePosition;
+        }
+        
+        // Generate trajectory data
+        function generateTrajectories() {
+            const objectCount = parseInt(document.getElementById('object-count').value) || 5;
+            currentTrajectoryData = [];
+            
+            for (let i = 0; i < objectCount; i++) {
+                const id = `Rabbit ${i + 1}`;
+                const color = config.objectColors[i % config.objectColors.length];
+                const points = [];
+                
+                // Generate start and end points near intersections or roads
+                let startPoint, endPoint;
+                
+                // 80% chance to start at or near an intersection
+                if (Math.random() < 0.8) {
+                    const intersections = roadNetwork.intersections;
+                    const randomIntersection = intersections[Math.floor(Math.random() * intersections.length)];
+                    // Add small random offset for realism
+                    startPoint = { 
+                        x: randomIntersection.x + (Math.random() - 0.5) * 15, 
+                        y: randomIntersection.y + (Math.random() - 0.5) * 15 
+                    };
+                } else {
+                    // Random point near a road
+                    const allRoads = [
+                        ...roadNetwork.primaryRoads,
+                        ...roadNetwork.secondaryRoads
+                    ];
+                    const randomRoad = allRoads[Math.floor(Math.random() * allRoads.length)];
+                    const t = Math.random();
+                    startPoint = {
+                        x: randomRoad.x1 + (randomRoad.x2 - randomRoad.x1) * t + (Math.random() - 0.5) * 20,
+                        y: randomRoad.y1 + (randomRoad.y2 - randomRoad.y1) * t + (Math.random() - 0.5) * 20
+                    };
+                }
+                
+                // 80% chance to end at or near an intersection
+                if (Math.random() < 0.8) {
+                    const intersections = roadNetwork.intersections;
+                    // Choose a different intersection than the start if possible
+                    let attempts = 0;
+                    let randomIntersection;
+                    do {
+                        randomIntersection = intersections[Math.floor(Math.random() * intersections.length)];
+                        attempts++;
+                    } while (attempts < 3 && 
+                           Math.abs(randomIntersection.x - startPoint.x) < 100 && 
+                           Math.abs(randomIntersection.y - startPoint.y) < 100);
+                    
+                    endPoint = { 
+                        x: randomIntersection.x + (Math.random() - 0.5) * 15, 
+                        y: randomIntersection.y + (Math.random() - 0.5) * 15 
+                    };
+                } else {
+                    // Random point near a road but away from start
+                    const allRoads = [
+                        ...roadNetwork.primaryRoads,
+                        ...roadNetwork.secondaryRoads
+                    ];
+                    let randomRoad;
+                    let attempts = 0;
+                    let candidatePoint;
+                    
+                    do {
+                        randomRoad = allRoads[Math.floor(Math.random() * allRoads.length)];
+                        const t = Math.random();
+                        candidatePoint = {
+                            x: randomRoad.x1 + (randomRoad.x2 - randomRoad.x1) * t + (Math.random() - 0.5) * 20,
+                            y: randomRoad.y1 + (randomRoad.y2 - randomRoad.y1) * t + (Math.random() - 0.5) * 20
+                        };
+                        attempts++;
+                    } while (attempts < 3 && 
+                           Math.sqrt(Math.pow(candidatePoint.x - startPoint.x, 2) + 
+                                    Math.pow(candidatePoint.y - startPoint.y, 2)) < 150);
+                    
+                    endPoint = candidatePoint;
+                }
+                
+                // Add start point
+                points.push(startPoint);
+                
+                // Generate path with realistic movement along roads
+                // 90% chance to follow roads for realism
+                const followRoads = Math.random() < 0.9;
+                
+                if (followRoads) {
+                    // Find path through road network that strictly follows road edges
+                    const allRoads = [
+                        ...roadNetwork.primaryRoads,
+                        ...roadNetwork.secondaryRoads,
+                        ...roadNetwork.tertiaryRoads
+                    ];
+                    
+                    // Find nearest road to start point
+                    let startRoad = null;
+                    let startRoadPoint = null;
+                    let minStartDist = Infinity;
+                    
+                    for (const road of allRoads) {
+                        const dist = distanceToLineSegment(
+                            startPoint.x, startPoint.y,
+                            road.x1, road.y1, road.x2, road.y2
+                        );
+                        
+                        if (dist < minStartDist) {
+                            minStartDist = dist;
+                            startRoad = road;
+                            
+                            // Calculate closest point on the road
+                            const t = projectPointOnLineSegment(
+                                startPoint.x, startPoint.y,
+                                road.x1, road.y1, road.x2, road.y2
+                            );
+                            
+                            startRoadPoint = {
+                                x: road.x1 + t * (road.x2 - road.x1),
+                                y: road.y1 + t * (road.y2 - road.y1)
+                            };
+                        }
+                    }
+                    
+                    // Find nearest road to end point
+                    let endRoad = null;
+                    let endRoadPoint = null;
+                    let minEndDist = Infinity;
+                    
+                    for (const road of allRoads) {
+                        const dist = distanceToLineSegment(
+                            endPoint.x, endPoint.y,
+                            road.x1, road.y1, road.x2, road.y2
+                        );
+                        
+                        if (dist < minEndDist) {
+                            minEndDist = dist;
+                            endRoad = road;
+                            
+                            // Calculate closest point on the road
+                            const t = projectPointOnLineSegment(
+                                endPoint.x, endPoint.y,
+                                road.x1, road.y1, road.x2, road.y2
+                            );
+                            
+                            endRoadPoint = {
+                                x: road.x1 + t * (road.x2 - road.x1),
+                                y: road.y1 + t * (road.y2 - road.y1)
+                            };
+                        }
+                    }
+                    
+                    // Start with the actual point on the road
+                    if (startRoadPoint) {
+                        // Replace the start point with the point on the road
+                        points[0] = startRoadPoint;
+                    }
+                    
+                    // Build a path through the road network
+                    const roadPath = [];
+                    
+                    // Find intersections connected to the start road
+                    const startIntersections = [];
+                    for (const intersection of roadNetwork.intersections) {
+                        // Check if intersection is on the start road
+                        const distToRoad = distanceToLineSegment(
+                            intersection.x, intersection.y,
+                            startRoad.x1, startRoad.y1, startRoad.x2, startRoad.y2
+                        );
+                        
+                        if (distToRoad < 5) { // If intersection is on this road
+                            startIntersections.push(intersection);
+                        }
+                    }
+                    
+                    // Find intersections connected to the end road
+                    const endIntersections = [];
+                    for (const intersection of roadNetwork.intersections) {
+                        // Check if intersection is on the end road
+                        const distToRoad = distanceToLineSegment(
+                            intersection.x, intersection.y,
+                            endRoad.x1, endRoad.y1, endRoad.x2, endRoad.y2
+                        );
+                        
+                        if (distToRoad < 5) { // If intersection is on this road
+                            endIntersections.push(intersection);
+                        }
+                    }
+                    
+                    // Add points along the start road to the nearest intersection
+                    if (startIntersections.length > 0) {
+                        // Find closest intersection to the start point
+                        let closestIntersection = startIntersections[0];
+                        let minDist = Math.sqrt(
+                            Math.pow(startRoadPoint.x - closestIntersection.x, 2) + 
+                            Math.pow(startRoadPoint.y - closestIntersection.y, 2)
+                        );
+                        
+                        for (let i = 1; i < startIntersections.length; i++) {
+                            const dist = Math.sqrt(
+                                Math.pow(startRoadPoint.x - startIntersections[i].x, 2) + 
+                                Math.pow(startRoadPoint.y - startIntersections[i].y, 2)
+                            );
+                            
+                            if (dist < minDist) {
+                                minDist = dist;
+                                closestIntersection = startIntersections[i];
+                            }
+                        }
+                        
+                        // Add points along the road to the intersection
+                        const numPoints = Math.floor(Math.random() * 2) + 3; // 3-4 points
+                        for (let j = 1; j <= numPoints; j++) {
+                            const t = j / (numPoints + 1);
+                            const point = {
+                                x: startRoadPoint.x + (closestIntersection.x - startRoadPoint.x) * t + (Math.random() - 0.5) * 3,
+                                y: startRoadPoint.y + (closestIntersection.y - startRoadPoint.y) * t + (Math.random() - 0.5) * 3
+                            };
+                            points.push(point);
+                        }
+                        
+                        // Add the intersection
+                        points.push({
+                            x: closestIntersection.x,
+                            y: closestIntersection.y
+                        });
+                        
+                        // Now find a path through other roads
+                        // Add 1-3 random intersections that are connected by roads
+                        const numIntermediateIntersections = Math.floor(Math.random() * 3) + 1;
+                        let currentIntersection = closestIntersection;
+                        
+                        for (let j = 0; j < numIntermediateIntersections; j++) {
+                            // Find roads connected to current intersection
+                            const connectedRoads = [];
+                            
+                            for (const road of allRoads) {
+                                const distToStart = Math.sqrt(
+                                    Math.pow(currentIntersection.x - road.x1, 2) + 
+                                    Math.pow(currentIntersection.y - road.y1, 2)
+                                );
+                                
+                                const distToEnd = Math.sqrt(
+                                    Math.pow(currentIntersection.x - road.x2, 2) + 
+                                    Math.pow(currentIntersection.y - road.y2, 2)
+                                );
+                                
+                                if (distToStart < 5 || distToEnd < 5) {
+                                    connectedRoads.push(road);
+                                }
+                            }
+                            
+                            if (connectedRoads.length > 0) {
+                                // Pick a random connected road
+                                const nextRoad = connectedRoads[Math.floor(Math.random() * connectedRoads.length)];
+                                
+                                // Find the other end of the road (not the current intersection)
+                                const distToStart = Math.sqrt(
+                                    Math.pow(currentIntersection.x - nextRoad.x1, 2) + 
+                                    Math.pow(currentIntersection.y - nextRoad.y1, 2)
+                                );
+                                
+                                const nextPoint = (distToStart < 5) ? 
+                                    { x: nextRoad.x2, y: nextRoad.y2 } : 
+                                    { x: nextRoad.x1, y: nextRoad.y1 };
+                                
+                                // Add points along this road
+                                const numRoadPoints = Math.floor(Math.random() * 3) + 2; // 2-4 points
+                                for (let k = 1; k <= numRoadPoints; k++) {
+                                    const t = k / (numRoadPoints + 1);
+                                    const point = {
+                                        x: currentIntersection.x + (nextPoint.x - currentIntersection.x) * t + (Math.random() - 0.5) * 3,
+                                        y: currentIntersection.y + (nextPoint.y - currentIntersection.y) * t + (Math.random() - 0.5) * 3
+                                    };
+                                    points.push(point);
+                                }
+                                
+                                // Find if there's an intersection at the next point
+                                let nextIntersection = null;
+                                for (const intersection of roadNetwork.intersections) {
+                                    const dist = Math.sqrt(
+                                        Math.pow(nextPoint.x - intersection.x, 2) + 
+                                        Math.pow(nextPoint.y - intersection.y, 2)
+                                    );
+                                    
+                                    if (dist < 5) {
+                                        nextIntersection = intersection;
+                                        break;
+                                    }
+                                }
+                                
+                                if (nextIntersection) {
+                                    points.push({
+                                        x: nextIntersection.x,
+                                        y: nextIntersection.y
+                                    });
+                                    currentIntersection = nextIntersection;
+                                } else {
+                                    // Just add the end of the road
+                                    points.push(nextPoint);
+                                    currentIntersection = { x: nextPoint.x, y: nextPoint.y };
+                                }
+                            }
+                        }
+                        
+                        // Finally, add points to the end road
+                        if (endRoadPoint) {
+                            const numFinalPoints = Math.floor(Math.random() * 2) + 2; // 2-3 points
+                            for (let j = 1; j <= numFinalPoints; j++) {
+                                const t = j / (numFinalPoints + 1);
+                                const point = {
+                                    x: currentIntersection.x + (endRoadPoint.x - currentIntersection.x) * t + (Math.random() - 0.5) * 3,
+                                    y: currentIntersection.y + (endRoadPoint.y - currentIntersection.y) * t + (Math.random() - 0.5) * 3
+                                };
+                                points.push(point);
+                            }
+                            
+                            // Add the end road point
+                            points.push(endRoadPoint);
+                        }
+                    }
+                } else {
+                    // Non-road following trajectory - smoother and more direct
+                    // Calculate distance between start and end
+                    const distance = Math.sqrt(
+                        Math.pow(endPoint.x - startPoint.x, 2) + 
+                        Math.pow(endPoint.y - startPoint.y, 2)
+                    );
+                    
+                    // More points for longer distances
+                    const numPoints = Math.max(3, Math.min(8, Math.floor(distance / 80)));
+                    
+                    for (let j = 1; j < numPoints; j++) {
+                        const t = j / numPoints;
+                        
+                        // Curved path with controlled randomness
+                        // Add some curvature with a sine wave
+                        const curveFactor = (Math.random() * 0.4) + 0.1; // 0.1 to 0.5
+                        const curveOffset = Math.sin(t * Math.PI) * distance * curveFactor;
+                        
+                        // Calculate perpendicular direction to create curve
+                        const dx = endPoint.x - startPoint.x;
+                        const dy = endPoint.y - startPoint.y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        
+                        // Perpendicular vector
+                        let perpX = -dy / length;
+                        let perpY = dx / length;
+                        
+                        // Randomly flip direction of curve
+                        if (Math.random() < 0.5) {
+                            perpX = -perpX;
+                            perpY = -perpY;
+                        }
+                        
+                        // Linear interpolation with curve
+                        const x = startPoint.x + dx * t + perpX * curveOffset;
+                        const y = startPoint.y + dy * t + perpY * curveOffset;
+                        
+                        points.push({ x, y });
+                    }
+                }
+                
+                // Add end point
+                points.push(endPoint);
+                
+                // Add timing for more realistic staggered animation
+                // Objects start at different times but with more consistent speeds
+                const startTime = Math.random() * 0.2; // Start within first 20% of animation
+                
+                // Duration based on path length for more realistic speed
+                let pathLength = 0;
+                for (let j = 1; j < points.length; j++) {
+                    pathLength += Math.sqrt(
+                        Math.pow(points[j].x - points[j-1].x, 2) + 
+                        Math.pow(points[j].y - points[j-1].y, 2)
+                    );
+                }
+                
+                // Normalize path length to get consistent speed across trajectories
+                // Longer paths take more time proportionally
+                const baseSpeed = 0.15; // pixels per millisecond
+                const duration = Math.min(0.8, pathLength / (config.width * baseSpeed));
+                const endTime = Math.min(1.0, startTime + duration);
+                
+                currentTrajectoryData.push({
+                    id,
+                    color,
+                    points,
+                    startTime,
+                    endTime
+                });
+            }
+            
+            // Calculate road following statistics
+            calculateRoadFollowingStats();
+            
+            debugLog("Generated trajectories", { count: currentTrajectoryData.length });
+        }
+        
+        // Render the road network
+        function renderRoadNetwork() {
+            const svg = d3.select(".visualization-container svg");
+            
+            // Clear previous roads and background elements
+            svg.selectAll(".road").remove();
+            svg.selectAll(".intersection").remove();
+            svg.selectAll(".background").remove();
+            
+            // Add background elements
+            // Green grass background
+            svg.append("rect")
+                .attr("class", "background grass")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", config.width)
+                .attr("height", config.height)
+                .attr("fill", "#9DE04F");
+                
+            // Add some brown land patches
+            const landPatches = [
+                {x: 50, y: 50, width: 150, height: 100},
+                {x: 300, y: 200, width: 200, height: 150},
+                {x: 600, y: 100, width: 150, height: 120},
+                {x: 100, y: 350, width: 180, height: 100}
+            ];
+            
+            landPatches.forEach(patch => {
+                svg.append("rect")
+                    .attr("class", "background land")
+                    .attr("x", patch.x)
+                    .attr("y", patch.y)
+                    .attr("width", patch.width)
+                    .attr("height", patch.height)
+                    .attr("fill", "#C68642")
+                    .attr("rx", 20)
+                    .attr("ry", 20);
+            });
+            
+            // Draw primary roads
+            roadNetwork.primaryRoads.forEach(road => {
+                svg.append("line")
+                    .attr("class", "road primary-road")
+                    .attr("x1", road.x1)
+                    .attr("y1", road.y1)
+                    .attr("x2", road.x2)
+                    .attr("y2", road.y2)
+                    .attr("stroke", config.roadColors.primary)
+                    .attr("stroke-width", 8 * roadMapScale);
+            });
+            
+            // Draw secondary roads
+            roadNetwork.secondaryRoads.forEach(road => {
+                svg.append("line")
+                    .attr("class", "road secondary-road")
+                    .attr("x1", road.x1)
+                    .attr("y1", road.y1)
+                    .attr("x2", road.x2)
+                    .attr("y2", road.y2)
+                    .attr("stroke", config.roadColors.secondary)
+                    .attr("stroke-width", 6 * roadMapScale);
+            });
+            
+            // Clear river segments array before adding new ones
+            riverSegments = [];
+            
+            // Draw tertiary roads - some as rivers
+            roadNetwork.tertiaryRoads.forEach((road, index) => {
+                // Make every third tertiary road a river
+                const isRiver = index % 3 === 0;
+                
+                svg.append("line")
+                    .attr("class", isRiver ? "road river" : "road tertiary-road")
+                    .attr("x1", road.x1)
+                    .attr("y1", road.y1)
+                    .attr("x2", road.x2)
+                    .attr("y2", road.y2)
+                    .attr("stroke", isRiver ? "#4FC3F7" : config.roadColors.tertiary)
+                    .attr("stroke-width", isRiver ? 8 * roadMapScale : 4 * roadMapScale)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-opacity", isRiver ? 0.8 : 1);
+                
+                // Add wavy pattern for rivers
+                if (isRiver) {
+                    // Store river segment for collision detection
+                    riverSegments.push({
+                        x1: road.x1,
+                        y1: road.y1,
+                        x2: road.x2,
+                        y2: road.y2,
+                        width: 8 * roadMapScale
+                    });
+                    
+                    // Add small decorative elements to make rivers look more natural
+                    const midX = (road.x1 + road.x2) / 2;
+                    const midY = (road.y1 + road.y2) / 2;
+                    
+                    svg.append("circle")
+                        .attr("class", "background river-detail")
+                        .attr("cx", midX)
+                        .attr("cy", midY)
+                        .attr("r", 3 * roadMapScale)
+                        .attr("fill", "#29B6F6");
+                }
+            });
+            
+            // Draw intersections
+            roadNetwork.intersections.forEach(intersection => {
+                svg.append("circle")
+                    .attr("class", "intersection")
+                    .attr("cx", intersection.x)
+                    .attr("cy", intersection.y)
+                    .attr("r", intersection.r * roadMapScale)
+                    .attr("fill", "#555");
+            });
+            
+            debugLog("Rendered road network", { layout: roadNetwork.name, scale: roadMapScale });
+        }
+        
+        // Render trajectories with animation progress
+        function renderTrajectories(progress = 1.0) {
+            const svg = d3.select(".visualization-container svg");
+            svg.selectAll(".trajectory-group").remove();
+            if (currentTrajectoryData.length === 0) {
+                generateTrajectories();
+            }
+            const trajectoryGroups = svg.selectAll(".trajectory-group")
+                .data(currentTrajectoryData)
+                .enter()
+                .append("g")
+                .attr("class", "trajectory-group");
+            trajectoryGroups.each(function(trajectory) {
+                const group = d3.select(this);
+                const startTime = trajectory.startTime || 0;
+                const endTime = trajectory.endTime || 1.0;
+                if (progress < startTime) return;
+                const points = trajectory.points;
+                let trajectoryProgress;
+                if (progress <= startTime) trajectoryProgress = 0;
+                else if (progress >= endTime) trajectoryProgress = 1.0;
+                else trajectoryProgress = (progress - startTime) / (endTime - startTime);
+                const numPointsToShow = Math.max(2, Math.floor(points.length * trajectoryProgress));
+                const visiblePoints = points.slice(0, numPointsToShow);
+                const lineGenerator = d3.line()
+                    .x(d => d.x)
+                    .y(d => d.y)
+                    .curve(d3.curveCatmullRom.alpha(0.5));
+                group.append("path")
+                    .attr("d", lineGenerator(visiblePoints))
+                    .attr("stroke", trajectory.color)
+                    .attr("stroke-width", 3)
+                    .attr("fill", "none")
+                    .attr("stroke-dasharray", "5,3")
+                    .attr("opacity", 0.7);
+                group.selectAll(".trajectory-point")
+                    .data(visiblePoints)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "trajectory-point")
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y)
+                    .attr("r", 3)
+                    .attr("fill", trajectory.color);
+                if (visiblePoints.length >= 2 && trajectoryProgress < 1.0) {
+                    const lastPoint = visiblePoints[visiblePoints.length - 1];
+                    const prevPoint = visiblePoints[visiblePoints.length - 2];
+                    const angle = Math.atan2(lastPoint.y - prevPoint.y, lastPoint.x - prevPoint.x);
+                    group.append("polygon")
+                        .attr("points", "0,-5 10,0 0,5")
+                        .attr("transform", `translate(${lastPoint.x},${lastPoint.y}) rotate(${angle * 180 / Math.PI})`)
+                        .attr("fill", trajectory.color);
+                }
+                if (visiblePoints.length > 0) {
+                    const lastPoint = visiblePoints[visiblePoints.length - 1];
+                    group.append("text")
+                        .attr("x", lastPoint.x + 10)
+                        .attr("y", lastPoint.y - 10)
+                        .attr("fill", trajectory.color)
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .text(trajectory.id);
+                }
+                
+                // Add rabbit icon that moves along the trajectory
+                if (trajectoryProgress > 0 && points.length > 0 && visiblePoints.length > 0) {
+                    // Get the current position of the rabbit based on visible points
+                    const currentPoint = visiblePoints[visiblePoints.length - 1];
+                    
+                    // Create rabbit icon group at the current position
+                    const rabbitGroup = group.append("g")
+                        .attr("transform", `translate(${currentPoint.x - 12}, ${currentPoint.y - 12})`);
+                    
+                    // Calculate movement direction for rabbit orientation
+                    let angle = 0;
+                    if (visiblePoints.length > 1) {
+                        const prevPoint = visiblePoints[visiblePoints.length - 2];
+                        angle = Math.atan2(currentPoint.y - prevPoint.y, currentPoint.x - prevPoint.x) * 180 / Math.PI;
+                    }
+                    
+                    // Rabbit background circle
+                    rabbitGroup.append("circle")
+                        .attr("cx", 12)
+                        .attr("cy", 12)
+                        .attr("r", 12)
+                        .attr("fill", "white")
+                        .attr("stroke", trajectory.color)
+                        .attr("stroke-width", 1.5);
+                    
+                    // Inner group for rabbit that can be rotated to face direction of movement
+                    const rabbitInnerGroup = rabbitGroup.append("g")
+                        .attr("transform", `translate(12, 12) rotate(${angle}) translate(-12, -12)`);
+                    
+                    // Rabbit body - cuter rounded shape
+                    rabbitInnerGroup.append("path")
+                        .attr("d", "M12,6 C9,6 7,8 7,11 C7,14 9,16 12,16 C15,16 17,14 17,11 C17,8 15,6 12,6 Z")
+                        .attr("fill", trajectory.color);
+                    
+                    // Rabbit ears - rounder and cuter
+                    rabbitInnerGroup.append("path")
+                        .attr("d", "M9,8 C9,8 8,4 9,2 C10,1 11,3 11,6 M15,8 C15,8 16,4 15,2 C14,1 13,3 13,6")
+                        .attr("fill", trajectory.color);
+                    
+                    // Rabbit face - cute features
+                    // Bigger eyes with white highlights
+                    rabbitInnerGroup.append("circle")
+                        .attr("cx", 10)
+                        .attr("cy", 10)
+                        .attr("r", 1.5)
+                        .attr("fill", "black");
+                    rabbitInnerGroup.append("circle")
+                        .attr("cx", 14)
+                        .attr("cy", 10)
+                        .attr("r", 1.5)
+                        .attr("fill", "black");
+                    
+                    // Eye highlights
+                    rabbitInnerGroup.append("circle")
+                        .attr("cx", 10.5)
+                        .attr("cy", 9.5)
+                        .attr("r", 0.5)
+                        .attr("fill", "white");
+                    rabbitInnerGroup.append("circle")
+                        .attr("cx", 14.5)
+                        .attr("cy", 9.5)
+                        .attr("r", 0.5)
+                        .attr("fill", "white");
+                    
+                    // Cute nose
+                    rabbitInnerGroup.append("circle")
+                        .attr("cx", 12)
+                        .attr("cy", 12)
+                        .attr("r", 1)
+                        .attr("fill", "pink");
+                    
+                    // Whiskers
+                    rabbitInnerGroup.append("path")
+                        .attr("d", "M11,12 L8,11 M11,12.5 L8,12.5 M11,13 L8,14 M13,12 L16,11 M13,12.5 L16,12.5 M13,13 L16,14")
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 0.5)
+                        .attr("fill", "none");
+                }
+                
+                // Add carrot icon at the end point - always visible
+                if (points.length > 0) {
+                    const endPoint = points[points.length - 1];
+                    
+                    // Find a safe position for the carrot (not in a river)
+                    // Pass the trajectory ID to ensure consistent positioning
+                    const safePosition = findSafeCarrotPosition(endPoint, trajectory.id);
+                    
+                    // Create carrot icon group
+                    const carrotGroup = group.append("g")
+                        .attr("transform", `translate(${safePosition.x - 12}, ${safePosition.y - 12})`);
+                    
+                    // Carrot background circle
+                    carrotGroup.append("circle")
+                        .attr("cx", 12)
+                        .attr("cy", 12)
+                        .attr("r", 12)
+                        .attr("fill", "white")
+                        .attr("stroke", trajectory.color)
+                        .attr("stroke-width", 1.5);
+                    
+                    // Carrot body - more recognizable carrot shape
+                    carrotGroup.append("path")
+                        .attr("d", "M12,20 L8,8 C8,6 10,4 12,4 C14,4 16,6 16,8 L12,20 Z")
+                        .attr("fill", "#ff7f0e");
+                    
+                    // Carrot texture lines
+                    carrotGroup.append("path")
+                        .attr("d", "M10,8 L14,8 M9,11 L15,11 M9,14 L15,14 M10,17 L14,17")
+                        .attr("stroke", "#e67300")
+                        .attr("stroke-width", 0.5)
+                        .attr("fill", "none");
+                    
+                    // Carrot leaves/greens
+                    carrotGroup.append("path")
+                        .attr("d", "M12,4 C12,4 10,2 8,3 C12,1 12,1 16,3 C14,2 12,4 12,4")
+                        .attr("fill", "#2ca02c");
+                    
+                    carrotGroup.append("path")
+                        .attr("d", "M12,4 L12,1 M10,2 L14,2")
+                        .attr("stroke", "#2ca02c")
+                        .attr("stroke-width", 1)
+                        .attr("fill", "none");
+                }
+            });
+            updateLegend(currentTrajectoryData);
+        }
+        
+        // Update the legend with current trajectories
+        function updateLegend(trajectories) {
+            // Get the legend container
+            const legend = document.getElementById("legend");
+            legend.innerHTML = ""; // Clear previous legend
+            
+            // Create a container for the legend items
+            const legendContainer = document.createElement("div");
+            legendContainer.style.display = "flex";
+            legendContainer.style.flexWrap = "wrap";
+            legendContainer.style.justifyContent = "center";
+            legendContainer.style.width = "100%";
+            legend.appendChild(legendContainer);
+            
+            trajectories.forEach(trajectory => {
+                // Create a legend item container
+                const legendItem = document.createElement("div");
+                legendItem.className = "legend-item";
+                legendItem.style.display = "flex";
+                legendItem.style.alignItems = "center";
+                legendItem.style.margin = "5px 15px";
+                legendItem.style.minWidth = "120px";
+                legendItem.style.justifyContent = "flex-start";
+                
+                // Create SVG for rabbit icon in legend
+                const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                iconSvg.setAttribute("width", "24");
+                iconSvg.setAttribute("height", "24");
+                iconSvg.setAttribute("class", "legend-icon");
+                iconSvg.style.marginRight = "15px";
+                
+                // Rabbit background circle
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", "12");
+                circle.setAttribute("cy", "12");
+                circle.setAttribute("r", "12");
+                circle.setAttribute("fill", "white");
+                circle.setAttribute("stroke", trajectory.color);
+                circle.setAttribute("stroke-width", "1.5");
+                iconSvg.appendChild(circle);
+                
+                // Rabbit body
+                const body = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                body.setAttribute("d", "M12,6 C9,6 7,8 7,11 C7,14 9,16 12,16 C15,16 17,14 17,11 C17,8 15,6 12,6 Z");
+                body.setAttribute("fill", trajectory.color);
+                iconSvg.appendChild(body);
+                
+                // Rabbit ears
+                const ears = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                ears.setAttribute("d", "M9,8 C9,8 8,4 9,2 C10,1 11,3 11,6 M15,8 C15,8 16,4 15,2 C14,1 13,3 13,6");
+                ears.setAttribute("fill", trajectory.color);
+                iconSvg.appendChild(ears);
+                
+                // Rabbit eyes
+                const leftEye = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                leftEye.setAttribute("cx", "10");
+                leftEye.setAttribute("cy", "10");
+                leftEye.setAttribute("r", "1.5");
+                leftEye.setAttribute("fill", "black");
+                iconSvg.appendChild(leftEye);
+                
+                const rightEye = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                rightEye.setAttribute("cx", "14");
+                rightEye.setAttribute("cy", "10");
+                rightEye.setAttribute("r", "1.5");
+                rightEye.setAttribute("fill", "black");
+                iconSvg.appendChild(rightEye);
+                
+                // Eye highlights
+                const leftHighlight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                leftHighlight.setAttribute("cx", "10.5");
+                leftHighlight.setAttribute("cy", "9.5");
+                leftHighlight.setAttribute("r", "0.5");
+                leftHighlight.setAttribute("fill", "white");
+                iconSvg.appendChild(leftHighlight);
+                
+                const rightHighlight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                rightHighlight.setAttribute("cx", "14.5");
+                rightHighlight.setAttribute("cy", "9.5");
+                rightHighlight.setAttribute("r", "0.5");
+                rightHighlight.setAttribute("fill", "white");
+                iconSvg.appendChild(rightHighlight);
+                
+                // Nose
+                const nose = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                nose.setAttribute("cx", "12");
+                nose.setAttribute("cy", "12");
+                nose.setAttribute("r", "1");
+                nose.setAttribute("fill", "pink");
+                iconSvg.appendChild(nose);
+                
+                // Add the icon to the legend item
+                legendItem.appendChild(iconSvg);
+                
+                // Create a container for the label with proper spacing
+                const labelContainer = document.createElement("div");
+                labelContainer.style.paddingLeft = "30px"; // Add more space between icon and text
+                labelContainer.style.position = "relative";
+                
+                // Add the label
+                const label = document.createElement("span");
+                label.textContent = trajectory.id;
+                label.style.fontSize = "14px";
+                label.style.fontWeight = "500";
+                label.style.whiteSpace = "nowrap";
+                labelContainer.appendChild(label);
+                
+                legendItem.appendChild(labelContainer);
+                
+                // Add the legend item to the container
+                legendContainer.appendChild(legendItem);
+            });
+        }
+        
+        // Animate trajectories with easing for more realistic motion
+        function animateTrajectories() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            const completionMessage = document.getElementById('completion-message');
+            completionMessage.style.opacity = 0;
+            
+            animationStartTime = Date.now();
+            
+            // Easing function for smoother acceleration/deceleration
+            function easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+            
+            function animate() {
+                const elapsed = Date.now() - animationStartTime;
+                const rawProgress = Math.min(1.0, elapsed / config.animationDuration);
+                
+                // Apply easing for smoother motion
+                const progress = easeInOutCubic(rawProgress);
+                
+                renderTrajectories(progress);
+                
+                if (rawProgress < 1.0) {
+                    animationId = requestAnimationFrame(animate);
+                } else {
+                    animationId = null;
+                    showCompletionMessage();
+                }
+            }
+            
+            animationId = requestAnimationFrame(animate);
+            debugLog("Started animation with realistic motion");
+        }
+        
+        // Show completion message
+        function showCompletionMessage() {
+            const completionMessage = document.getElementById('completion-message');
+            completionMessage.textContent = "Animation Complete";
+            completionMessage.style.opacity = 1;
+            
+            setTimeout(() => {
+                completionMessage.style.opacity = 0;
+            }, 3000);
+            
+            debugLog("Animation completed");
+        }
+        
+        // Initialize the visualization
+        function initialize() {
+            // Set up SVG
+            const svg = d3.select(".visualization-container svg")
+                .attr("width", config.width)
+                .attr("height", config.height);
+            
+            // Render initial road network
+            renderRoadNetwork();
+            
+            // Generate and render trajectories
+            generateTrajectories();
+            renderTrajectories(0);
+            
+            // Set up event listeners
+            document.getElementById('update-btn').addEventListener('click', () => {
+                generateTrajectories();
+                renderTrajectories(0);
+                debugLog("Updated trajectories");
+            });
+            
+            document.getElementById('play-btn').addEventListener('click', () => {
+                animateTrajectories();
+            });
+            
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                renderTrajectories(0);
+                debugLog("Reset animation");
+            });
+            
+            document.getElementById('layout-selector').addEventListener('change', (e) => {
+                currentLayoutIndex = parseInt(e.target.value);
+                roadNetwork = roadLayouts[currentLayoutIndex];
+                renderRoadNetwork();
+                generateTrajectories();
+                renderTrajectories(0);
+                debugLog("Changed road layout", { layout: roadNetwork.name });
+            });
+            
+            // Road size slider
+            const roadSizeSlider = document.getElementById('road-size');
+            const roadSizeValue = document.getElementById('road-size-value');
+            
+            roadSizeSlider.addEventListener('input', (e) => {
+                roadSizeValue.textContent = e.target.value;
+            });
+            
+            document.getElementById('apply-size-btn').addEventListener('click', () => {
+                roadMapScale = parseFloat(roadSizeSlider.value);
+                renderRoadNetwork();
+                calculateRoadFollowingStats(); // Recalculate with new scale
+                renderTrajectories(0);
+                debugLog("Applied road size", { scale: roadMapScale });
+            });
+            
+            // Debug toggle
+            document.getElementById('debug-toggle').addEventListener('change', (e) => {
+                const debugConsole = document.querySelector('.debug-console');
+                debugConsole.style.display = e.target.checked ? 'block' : 'none';
+                if (e.target.checked) {
+                    debugLog("Debug mode enabled");
+                }
+            });
+            
+            debugLog("Initialization complete");
+        }
+        
+        // Make sure all functions are available globally
+        window.renderTrajectories = renderTrajectories;
+        window.generateTrajectories = generateTrajectories;
+        window.initVisualization = initialize;
+        window.currentTrajectoryData = currentTrajectoryData;
+        window.config = {
+            animationDuration: 20000, // 20 seconds for animation
+            objectColors: config.objectColors
+        };
+        
+        // Initialize when the DOM is fully loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            // First initialize our visualization
+            initialize();
+            
+            // Make sure all buttons have proper z-index and are clickable
+            document.querySelectorAll('button').forEach(function(button) {
+                button.style.position = 'relative';
+                button.style.zIndex = '10';
+            });
+        });
+    </script>
+</body>
+</html>

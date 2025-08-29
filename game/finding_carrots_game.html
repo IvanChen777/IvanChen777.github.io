@@ -200,10 +200,16 @@
     <div class="controls">
         <div class="control-group">
             <label for="object-count">Number of Rabbits:</label>
-            <input type="number" id="object-count" min="1" max="10" value="5">
-            <button id="update-btn">Update</button>
+            <input type="number" id="object-count" min="1" max="10" value="5" style="width: 60px;">
+            
+            <label for="vehicle-count">Number of Vehicles:</label>
+            <input type="number" id="vehicle-count" min="0" max="5" value="5" style="width: 60px;">
+            
+            <label for="parking-count">Number of Parking Spaces:</label>
+            <input type="number" id="parking-count" min="0" max="5" value="5" style="width: 60px;">
         </div>
         <div class="control-group">
+            <button id="update-btn">Update</button>
             <button id="play-btn">Play Animation</button>
             <button id="reset-btn">Reset</button>
         </div>
@@ -217,8 +223,7 @@
         </div>
         <div class="control-group">
             <label for="road-size">Road Size:</label>
-            <input type="range" id="road-size" min="0.5" max="2.0" step="0.1" value="1.0">
-            <span id="road-size-value">1.0</span>
+            <input type="number" id="road-size" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 60px;">
             <button id="apply-size-btn">Apply Size</button>
         </div>
     </div>
@@ -483,11 +488,13 @@
         ];
 
         // Global variables
-        let currentLayoutIndex = 0;
-        let roadNetwork = roadLayouts[currentLayoutIndex];
-        let roadMapScale = 1.0;
-        let roadFollowingStats = { total: 0, following: 0, percentage: 0 };
         let currentTrajectoryData = [];
+        let currentVehicleData = [];
+        let currentRoadLayout = 0;
+        let roadNetwork = roadLayouts[0]; // Initialize with first layout
+        let roadMapScale = 1.0;
+        let riverSegments = [];
+        let roadFollowingStats = { total: 0, following: 0, percentage: 0 };
         let animationId = null;
         let animationStartTime = null;
         
@@ -647,7 +654,7 @@
         }
         
         // Store river locations for collision detection
-        let riverSegments = [];
+        // riverSegments already declared above
         
         // Cache for safe carrot positions to prevent movement during animation
         let safeCarrotPositions = {};
@@ -731,6 +738,70 @@
                 // Check if this position is safe
                 if (!isPointInRiver(newX, newY)) {
                     const safePosition = { x: newX, y: newY };
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    const legendIcon = document.createElement('i');
+                    legendIcon.className = 'fas fa-carrot legend-icon';
+                    legendIcon.style.color = 'orange';
+                    const legendText = document.createElement('span');
+                    legendText.textContent = 'Carrot (Destination)';
+                    legendItem.appendChild(legendIcon);
+                    legendItem.appendChild(legendText);
+                    document.getElementById('legend').appendChild(legendItem);
+                    
+                    const vehicleLegendItem = document.createElement('div');
+                    vehicleLegendItem.className = 'legend-item';
+                    const vehicleLegendIcon = document.createElement('svg');
+                    vehicleLegendIcon.width = 20;
+                    vehicleLegendIcon.height = 12;
+                    vehicleLegendIcon.className = 'legend-icon';
+                    const vehicleBody = document.createElement('rect');
+                    vehicleBody.x = 2;
+                    vehicleBody.y = 2;
+                    vehicleBody.width = 16;
+                    vehicleBody.height = 8;
+                    vehicleBody.rx = 2;
+                    vehicleBody.ry = 2;
+                    vehicleBody.fill = '#1f77b4';
+                    vehicleBody.stroke = 'white';
+                    vehicleBody.strokeWidth = 1;
+                    const vehicleWindow1 = document.createElement('rect');
+                    vehicleWindow1.x = 4;
+                    vehicleWindow1.y = 3;
+                    vehicleWindow1.width = 4;
+                    vehicleWindow1.height = 3;
+                    vehicleWindow1.rx = 1;
+                    vehicleWindow1.fill = '#87CEEB';
+                    vehicleWindow1.opacity = 0.8;
+                    const vehicleWindow2 = document.createElement('rect');
+                    vehicleWindow2.x = 12;
+                    vehicleWindow2.y = 3;
+                    vehicleWindow2.width = 4;
+                    vehicleWindow2.height = 3;
+                    vehicleWindow2.rx = 1;
+                    vehicleWindow2.fill = '#87CEEB';
+                    vehicleWindow2.opacity = 0.8;
+                    const vehicleWheel1 = document.createElement('circle');
+                    vehicleWheel1.cx = 5;
+                    vehicleWheel1.cy = 10;
+                    vehicleWheel1.r = 1;
+                    vehicleWheel1.fill = '#333';
+                    const vehicleWheel2 = document.createElement('circle');
+                    vehicleWheel2.cx = 15;
+                    vehicleWheel2.cy = 10;
+                    vehicleWheel2.r = 1;
+                    vehicleWheel2.fill = '#333';
+                    vehicleLegendIcon.appendChild(vehicleBody);
+                    vehicleLegendIcon.appendChild(vehicleWindow1);
+                    vehicleLegendIcon.appendChild(vehicleWindow2);
+                    vehicleLegendIcon.appendChild(vehicleWheel1);
+                    vehicleLegendIcon.appendChild(vehicleWheel2);
+                    const vehicleLegendText = document.createElement('span');
+                    vehicleLegendText.textContent = 'Vehicle (Road Follower)';
+                    vehicleLegendItem.appendChild(vehicleLegendIcon);
+                    vehicleLegendItem.appendChild(vehicleLegendText);
+                    document.getElementById('legend').appendChild(vehicleLegendItem);
+                    
                     // Cache this position
                     safeCarrotPositions[cacheKey] = safePosition;
                     return safePosition;
@@ -752,6 +823,7 @@
         // Generate trajectory data
         function generateTrajectories() {
             const objectCount = parseInt(document.getElementById('object-count').value) || 5;
+            debugLog("generateTrajectories called", { objectCount });
             currentTrajectoryData = [];
             
             for (let i = 0; i < objectCount; i++) {
@@ -1140,10 +1212,883 @@
                 });
             }
             
-            // Calculate road following statistics
-            calculateRoadFollowingStats();
+            debugLog("Generated trajectories", { count: currentTrajectoryData.length, stats: roadFollowingStats });
+        }
+        
+        // Generate vehicle paths that strictly follow roads
+        function generateVehicles() {
+            const vehicleCount = parseInt(document.getElementById("vehicle-count").value) || 3;
+            debugLog("generateVehicles called", { vehicleCount });
+            currentVehicleData = [];
             
-            debugLog("Generated trajectories", { count: currentTrajectoryData.length });
+            const roadNetwork = roadLayouts[currentRoadLayout];
+            const parkingSpaces = createParkingSpaces(roadNetwork.intersections);
+            
+            // Only generate vehicles if there are at least 2 parking spaces
+            const actualVehicleCount = parkingSpaces.length >= 2 ? vehicleCount : 0;
+            
+            debugLog("Generating vehicles", { 
+                vehicleCount,
+                actualVehicleCount,
+                parkingSpaceCount: parkingSpaces.length
+            });
+            
+            if (actualVehicleCount === 0) return;
+            
+            for (let i = 0; i < actualVehicleCount; i++) {
+                const id = `Vehicle ${i + 1}`;
+                
+                // Select random start and end parking spaces
+                const startParkingSpace = parkingSpaces[Math.floor(Math.random() * parkingSpaces.length)];
+                let endParkingSpace;
+                do {
+                    endParkingSpace = parkingSpaces[Math.floor(Math.random() * parkingSpaces.length)];
+                } while (endParkingSpace === startParkingSpace && parkingSpaces.length > 1);
+                
+                // Generate path from parking space to parking space
+                const finalVehiclePath = generateParkingSpacePath(startParkingSpace, endParkingSpace, roadNetwork);
+                
+                debugLog("Created parking-to-parking vehicle path", { 
+                    vehicleId: id,
+                    pathLength: finalVehiclePath.length,
+                    startParking: `P${startParkingSpace.id} (${startParkingSpace.x},${startParkingSpace.y})`,
+                    endParking: `P${endParkingSpace.id} (${endParkingSpace.x},${endParkingSpace.y})`
+                });
+                
+                if (finalVehiclePath.length > 0) { // Accept any valid path
+                    // Calculate path distance to determine appropriate timing
+                    const pathDistance = calculateTotalPathDistance(finalVehiclePath);
+                    const averageSpeed = 150; // pixels per second (adjust for desired speed)
+                    const travelDuration = Math.min(0.8, pathDistance / averageSpeed / 20); // 20 second animation
+                    
+                    const startTime = Math.random() * 0.1; // Very early start
+                    const endTime = Math.min(0.95, startTime + travelDuration); // Ensure completion before animation ends
+                    
+                    currentVehicleData.push({
+                        id: id,
+                        color: config.objectColors[i % config.objectColors.length],
+                        points: finalVehiclePath,
+                        startTime: startTime,
+                        endTime: endTime
+                    });
+                    
+                    debugLog("Created vehicle", { 
+                        vehicleId: id,
+                        pathLength: finalVehiclePath.length,
+                        duration: travelDuration,
+                        startTime: startTime,
+                        endTime: endTime
+                    });
+                }
+            }
+            
+            debugLog("Generated vehicles", { count: currentVehicleData.length });
+        }
+        
+        // Create predefined route templates that guarantee turning
+        function createRouteTemplates(nodes, links, roadNetwork) {
+            const templates = [];
+            
+            // Find boundary nodes (corners and edges)
+            const boundaryNodes = [];
+            for (const [nodeId, node] of nodes) {
+                const connections = links.get(nodeId) || [];
+                if (connections.length >= 2) { // Has multiple connections for turning
+                    boundaryNodes.push(node);
+                }
+            }
+            
+            if (boundaryNodes.length >= 4) {
+                // Create corner-to-corner diagonal routes
+                const corners = findGridCorners(boundaryNodes, roadNetwork);
+                
+                if (corners.length >= 4) {
+                    templates.push({
+                        type: 'diagonal-top-left-to-bottom-right',
+                        start: corners[0], // top-left
+                        end: corners[2]    // bottom-right
+                    });
+                    
+                    templates.push({
+                        type: 'diagonal-top-right-to-bottom-left',
+                        start: corners[1], // top-right
+                        end: corners[3]    // bottom-left
+                    });
+                }
+                
+                // Create L-shaped routes that guarantee multiple turns
+                templates.push({
+                    type: 'L-shape-horizontal-first',
+                    start: boundaryNodes[0],
+                    end: boundaryNodes[Math.floor(boundaryNodes.length / 2)],
+                    waypoints: [boundaryNodes[Math.floor(boundaryNodes.length / 4)]]
+                });
+                
+                templates.push({
+                    type: 'L-shape-vertical-first',
+                    start: boundaryNodes[1],
+                    end: boundaryNodes[Math.floor(boundaryNodes.length * 3 / 4)],
+                    waypoints: [boundaryNodes[Math.floor(boundaryNodes.length / 3)]]
+                });
+            }
+            
+            return templates;
+        }
+        
+        // Find corner nodes in a grid-like structure
+        function findGridCorners(nodes, roadNetwork) {
+            if (nodes.length < 4) return nodes;
+            
+            // Sort nodes to find corners (extreme positions)
+            const sorted = [...nodes];
+            sorted.sort((a, b) => a.x - b.x || a.y - b.y);
+            
+            const minX = Math.min(...nodes.map(n => n.x));
+            const maxX = Math.max(...nodes.map(n => n.x));
+            const minY = Math.min(...nodes.map(n => n.y));
+            const maxY = Math.max(...nodes.map(n => n.y));
+            
+            const corners = [];
+            
+            // Find approximate corners
+            for (const node of nodes) {
+                const isLeftEdge = Math.abs(node.x - minX) < 20;
+                const isRightEdge = Math.abs(node.x - maxX) < 20;
+                const isTopEdge = Math.abs(node.y - minY) < 20;
+                const isBottomEdge = Math.abs(node.y - maxY) < 20;
+                
+                if ((isLeftEdge && isTopEdge) || (isRightEdge && isTopEdge) || 
+                    (isLeftEdge && isBottomEdge) || (isRightEdge && isBottomEdge)) {
+                    corners.push(node);
+                }
+            }
+            
+            return corners.length >= 4 ? corners.slice(0, 4) : nodes.slice(0, 4);
+        }
+        
+        // Generate path from a route template
+        function generatePathFromTemplate(template, nodes, links) {
+            if (!template.start || !template.end) return [];
+            
+            // Use Dijkstra to find path between template points
+            const path = dijkstraPath(template.start, template.end, nodes, links);
+            
+            if (path.length > 0) {
+                // Convert node path to coordinate path with smooth interpolation
+                return convertNodePathToCoordinates(path, links);
+            }
+            
+            return [];
+        }
+        
+        // Find corner nodes for fallback method
+        function findCornerNodes(nodes, roadNetwork) {
+            const nodeArray = Array.from(nodes.values());
+            return findGridCorners(nodeArray, roadNetwork);
+        }
+        
+        // Generate path between two specific nodes
+        function generatePathBetweenNodes(startNode, endNode, nodes, links) {
+            const path = dijkstraPath(startNode, endNode, nodes, links);
+            if (path.length > 0) {
+                return convertNodePathToCoordinates(path, links);
+            }
+            return [];
+        }
+        
+        // Convert node-based path to coordinate-based path
+        function convertNodePathToCoordinates(nodePath, links) {
+            if (nodePath.length < 2) return [];
+            
+            const coordinates = [];
+            
+            for (let i = 0; i < nodePath.length - 1; i++) {
+                const currentNode = nodePath[i];
+                const nextNode = nodePath[i + 1];
+                
+                // Add current node position
+                coordinates.push({ x: currentNode.x, y: currentNode.y });
+                
+                // Add intermediate points for smooth turning
+                if (i < nodePath.length - 2) {
+                    const prevNode = i > 0 ? nodePath[i - 1] : currentNode;
+                    const futureNode = nodePath[i + 2];
+                    
+                    // Calculate turning points for smooth curves
+                    const turnRadius = 15;
+                    const turningPoints = calculateTurningPoints(
+                        prevNode, currentNode, nextNode, futureNode, turnRadius
+                    );
+                    
+                    coordinates.push(...turningPoints);
+                }
+            }
+            
+            // Add final node
+            coordinates.push({ 
+                x: nodePath[nodePath.length - 1].x, 
+                y: nodePath[nodePath.length - 1].y 
+            });
+            
+            return coordinates;
+        }
+        
+        // Generate grid-based path that follows road segments with 90-degree turns only
+        function generateGridBasedPath(startRoad, endRoad, allRoads, intersections) {
+            const path = [];
+            
+            // Start at beginning of start road
+            const startPoint = { x: startRoad.x1, y: startRoad.y1 };
+            const startEndPoint = { x: startRoad.x2, y: startRoad.y2 };
+            
+            // Target is beginning of end road
+            const endPoint = { x: endRoad.x1, y: endRoad.y1 };
+            
+            path.push(startPoint);
+            path.push(startEndPoint);
+            
+            // Find path from end of start road to beginning of end road using grid movement
+            const gridPath = findGridPath(startEndPoint, endPoint, allRoads, intersections);
+            path.push(...gridPath);
+            
+            // End at end of target road
+            path.push({ x: endRoad.x2, y: endRoad.y2 });
+            
+            return path;
+        }
+        
+        // Find path through grid network using only horizontal/vertical movement
+        function findGridPath(start, end, allRoads, intersections) {
+            const path = [];
+            let current = { x: start.x, y: start.y };
+            
+            // Simple grid pathfinding - move horizontally first, then vertically
+            // This ensures 90-degree turns only
+            
+            // Step 1: Move horizontally towards target
+            if (Math.abs(current.x - end.x) > 10) {
+                const horizontalTarget = { x: end.x, y: current.y };
+                
+                // Find horizontal road segment
+                const horizontalRoad = findRoadSegment(current, horizontalTarget, allRoads, 'horizontal');
+                if (horizontalRoad) {
+                    // Add points along horizontal movement
+                    const steps = Math.abs(horizontalTarget.x - current.x) / 50; // 50 pixel steps
+                    for (let i = 1; i <= steps; i++) {
+                        const stepX = current.x + (horizontalTarget.x - current.x) * (i / steps);
+                        path.push({ x: stepX, y: current.y });
+                    }
+                    current = horizontalTarget;
+                }
+            }
+            
+            // Step 2: Move vertically towards target
+            if (Math.abs(current.y - end.y) > 10) {
+                const verticalTarget = { x: current.x, y: end.y };
+                
+                // Find vertical road segment
+                const verticalRoad = findRoadSegment(current, verticalTarget, allRoads, 'vertical');
+                if (verticalRoad) {
+                    // Add points along vertical movement
+                    const steps = Math.abs(verticalTarget.y - current.y) / 50; // 50 pixel steps
+                    for (let i = 1; i <= steps; i++) {
+                        const stepY = current.y + (verticalTarget.y - current.y) * (i / steps);
+                        path.push({ x: current.x, y: stepY });
+                    }
+                    current = verticalTarget;
+                }
+            }
+            
+            return path;
+        }
+        
+        // Find road segment that supports movement in specified direction
+        function findRoadSegment(from, to, allRoads, direction) {
+            const tolerance = 20;
+            
+            for (const road of allRoads) {
+                if (direction === 'horizontal') {
+                    // Check if road is horizontal and overlaps with our path
+                    const isHorizontal = Math.abs(road.y1 - road.y2) < tolerance;
+                    const yMatch = Math.abs(road.y1 - from.y) < tolerance || Math.abs(road.y2 - from.y) < tolerance;
+                    
+                    if (isHorizontal && yMatch) {
+                        const roadMinX = Math.min(road.x1, road.x2);
+                        const roadMaxX = Math.max(road.x1, road.x2);
+                        const pathMinX = Math.min(from.x, to.x);
+                        const pathMaxX = Math.max(from.x, to.x);
+                        
+                        // Check if road segment overlaps with our horizontal movement
+                        if (roadMaxX >= pathMinX && roadMinX <= pathMaxX) {
+                            return road;
+                        }
+                    }
+                } else if (direction === 'vertical') {
+                    // Check if road is vertical and overlaps with our path
+                    const isVertical = Math.abs(road.x1 - road.x2) < tolerance;
+                    const xMatch = Math.abs(road.x1 - from.x) < tolerance || Math.abs(road.x2 - from.x) < tolerance;
+                    
+                    if (isVertical && xMatch) {
+                        const roadMinY = Math.min(road.y1, road.y2);
+                        const roadMaxY = Math.max(road.y1, road.y2);
+                        const pathMinY = Math.min(from.y, to.y);
+                        const pathMaxY = Math.max(from.y, to.y);
+                        
+                        // Check if road segment overlaps with our vertical movement
+                        if (roadMaxY >= pathMinY && roadMinY <= pathMaxY) {
+                            return road;
+                        }
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        // Create parking spaces near intersections based on slider value
+        function createParkingSpaces(intersections) {
+            const parkingSpaceCount = parseInt(document.getElementById('parking-count').value) || 5;
+            debugLog("createParkingSpaces called", { parkingSpaceCount });
+            const parkingSpaces = [];
+            
+            if (intersections.length >= parkingSpaceCount && parkingSpaceCount > 0) {
+                // Select intersections evenly distributed
+                for (let i = 0; i < parkingSpaceCount; i++) {
+                    const index = Math.floor(i * intersections.length / parkingSpaceCount);
+                    const intersection = intersections[index];
+                    
+                    // Place parking space near intersection with different angles
+                    const angles = [45, 135, 225, 315, 0]; // Different angles for each parking space
+                    const angle = angles[i % angles.length] * Math.PI / 180;
+                    const offset = 25; // Distance from intersection
+                    
+                    parkingSpaces.push({
+                        id: i + 1,
+                        x: intersection.x + Math.cos(angle) * offset,
+                        y: intersection.y + Math.sin(angle) * offset,
+                        nearestIntersection: intersection
+                    });
+                }
+            }
+            
+            return parkingSpaces;
+        }
+        
+        // Generate path between two parking spaces
+        function generateParkingSpacePath(startParking, endParking, roadNetwork) {
+            const path = [];
+            
+            // Start at parking space
+            path.push({ x: startParking.x, y: startParking.y });
+            
+            // Move to nearest intersection from start parking
+            path.push({ x: startParking.nearestIntersection.x, y: startParking.nearestIntersection.y });
+            
+            // If different intersections, find path between them
+            if (startParking.nearestIntersection !== endParking.nearestIntersection) {
+                const gridPath = findGridPath(
+                    startParking.nearestIntersection, 
+                    endParking.nearestIntersection, 
+                    [...roadNetwork.primaryRoads, ...roadNetwork.secondaryRoads, 
+                     ...roadNetwork.tertiaryRoads.filter((_, index) => index % 3 !== 0)], 
+                    roadNetwork.intersections
+                );
+                path.push(...gridPath);
+            }
+            
+            // Move from end intersection to end parking space
+            path.push({ x: endParking.nearestIntersection.x, y: endParking.nearestIntersection.y });
+            path.push({ x: endParking.x, y: endParking.y });
+            
+            return path;
+        }
+
+        // Dijkstra pathfinding between nodes
+        function dijkstraPath(startNode, endNode, nodes, links) {
+            const distances = new Map();
+            const previous = new Map();
+            const unvisited = new Set();
+            
+            // Initialize distances
+            for (const [nodeId, node] of nodes) {
+                distances.set(nodeId, nodeId === startNode.id ? 0 : Infinity);
+                unvisited.add(nodeId);
+            }
+            
+            while (unvisited.size > 0) {
+                // Find unvisited node with minimum distance
+                let currentNodeId = null;
+                let minDistance = Infinity;
+                
+                for (const nodeId of unvisited) {
+                    if (distances.get(nodeId) < minDistance) {
+                        minDistance = distances.get(nodeId);
+                        currentNodeId = nodeId;
+                    }
+                }
+                
+                if (currentNodeId === null || minDistance === Infinity) break;
+                
+                unvisited.delete(currentNodeId);
+                
+                if (currentNodeId === endNode.id) break;
+                
+                // Check neighbors
+                const neighbors = links.get(currentNodeId) || [];
+                for (const neighborId of neighbors) {
+                    if (!unvisited.has(neighborId)) continue;
+                    
+                    const currentNode = nodes.get(currentNodeId);
+                    const neighborNode = nodes.get(neighborId);
+                    const distance = Math.sqrt(
+                        Math.pow(neighborNode.x - currentNode.x, 2) + 
+                        Math.pow(neighborNode.y - currentNode.y, 2)
+                    );
+                    
+                    const altDistance = distances.get(currentNodeId) + distance;
+                    if (altDistance < distances.get(neighborId)) {
+                        distances.set(neighborId, altDistance);
+                        previous.set(neighborId, currentNodeId);
+                    }
+                }
+            }
+            
+            // Reconstruct path
+            const path = [];
+            let currentId = endNode.id;
+            
+            while (currentId !== undefined) {
+                path.unshift(nodes.get(currentId));
+                currentId = previous.get(currentId);
+            }
+            
+            return path.length > 1 ? path : [];
+        }
+
+        // Define explicit node-link structure for road network
+        function createRoadNetworkStructure(allRoads, intersections) {
+            const nodes = new Map();
+            const links = new Map();
+            const tolerance = 15;
+            
+            // Create nodes from intersections
+            intersections.forEach((intersection, index) => {
+                const nodeId = `node_${index}`;
+                nodes.set(nodeId, {
+                    id: nodeId,
+                    x: intersection.x,
+                    y: intersection.y,
+                    connectedLinks: []
+                });
+            });
+            
+            // Create links from roads
+            allRoads.forEach((road, roadIndex) => {
+                const linkId = `link_${roadIndex}`;
+                const roadStart = { x: road.x1, y: road.y1 };
+                const roadEnd = { x: road.x2, y: road.y2 };
+                
+                // Find nodes at road endpoints
+                let startNodeId = null;
+                let endNodeId = null;
+                
+                for (const [nodeId, node] of nodes) {
+                    const distToStart = Math.sqrt(
+                        Math.pow(node.x - roadStart.x, 2) + 
+                        Math.pow(node.y - roadStart.y, 2)
+                    );
+                    const distToEnd = Math.sqrt(
+                        Math.pow(node.x - roadEnd.x, 2) + 
+                        Math.pow(node.y - roadEnd.y, 2)
+                    );
+                    
+                    if (distToStart < tolerance) {
+                        startNodeId = nodeId;
+                    }
+                    if (distToEnd < tolerance) {
+                        endNodeId = nodeId;
+                    }
+                }
+                
+                // Create link if both endpoints have nodes
+                if (startNodeId && endNodeId && startNodeId !== endNodeId) {
+                    const roadLength = Math.sqrt(
+                        Math.pow(road.x2 - road.x1, 2) + 
+                        Math.pow(road.y2 - road.y1, 2)
+                    );
+                    
+                    const link = {
+                        id: linkId,
+                        startNode: startNodeId,
+                        endNode: endNodeId,
+                        startX: road.x1,
+                        startY: road.y1,
+                        endX: road.x2,
+                        endY: road.y2,
+                        length: roadLength,
+                        road: road
+                    };
+                    
+                    links.set(linkId, link);
+                    
+                    // Add link to connected nodes
+                    nodes.get(startNodeId).connectedLinks.push(linkId);
+                    nodes.get(endNodeId).connectedLinks.push(linkId);
+                }
+            });
+            
+            return { nodes, links };
+        }
+        
+        // Dijkstra's algorithm using node-link structure
+        function dijkstraShortestPath(nodes, links, startNodeId, endNodeId) {
+            const distances = new Map();
+            const previous = new Map();
+            const unvisited = new Set();
+            
+            // Initialize distances
+            for (const nodeId of nodes.keys()) {
+                distances.set(nodeId, nodeId === startNodeId ? 0 : Infinity);
+                unvisited.add(nodeId);
+            }
+            
+            while (unvisited.size > 0) {
+                // Find unvisited node with minimum distance
+                let currentNode = null;
+                let minDistance = Infinity;
+                for (const nodeId of unvisited) {
+                    if (distances.get(nodeId) < minDistance) {
+                        minDistance = distances.get(nodeId);
+                        currentNode = nodeId;
+                    }
+                }
+                
+                if (currentNode === null || minDistance === Infinity) break;
+                
+                unvisited.delete(currentNode);
+                
+                if (currentNode === endNodeId) break;
+                
+                // Check all links connected to current node
+                const connectedLinks = nodes.get(currentNode).connectedLinks;
+                for (const linkId of connectedLinks) {
+                    const link = links.get(linkId);
+                    const neighborNodeId = link.startNode === currentNode ? link.endNode : link.startNode;
+                    
+                    if (unvisited.has(neighborNodeId)) {
+                        const newDistance = distances.get(currentNode) + link.length;
+                        if (newDistance < distances.get(neighborNodeId)) {
+                            distances.set(neighborNodeId, newDistance);
+                            previous.set(neighborNodeId, {
+                                nodeId: currentNode,
+                                linkId: linkId
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Reconstruct path as sequence of links
+            const linkPath = [];
+            let currentNode = endNodeId;
+            
+            while (previous.has(currentNode)) {
+                const prev = previous.get(currentNode);
+                linkPath.unshift(prev.linkId);
+                currentNode = prev.nodeId;
+            }
+            
+            return linkPath;
+        }
+        
+        // Helper function to calculate total distance along a path
+        function calculateTotalPathDistance(points) {
+            let totalDistance = 0;
+            for (let i = 0; i < points.length - 1; i++) {
+                totalDistance += Math.sqrt(
+                    Math.pow(points[i + 1].x - points[i].x, 2) + 
+                    Math.pow(points[i + 1].y - points[i].y, 2)
+                );
+            }
+            return totalDistance;
+        }
+        
+        // Generate a path for a vehicle using node-link structure
+        function generateVehiclePath(startRoad, endRoad, allRoads, intersections) {
+            const points = [];
+            
+            // Create node-link structure
+            const { nodes, links } = createRoadNetworkStructure(allRoads, intersections);
+            
+            // Find nodes closest to start and end roads
+            const tolerance = 15;
+            let startNodeId = null;
+            let endNodeId = null;
+            
+            for (const [nodeId, node] of nodes) {
+                // Check if node is on start road
+                const distToStartRoad = distanceToLineSegment(
+                    node.x, node.y,
+                    startRoad.x1, startRoad.y1, startRoad.x2, startRoad.y2
+                );
+                if (distToStartRoad < tolerance) {
+                    startNodeId = nodeId;
+                }
+                
+                // Check if node is on end road
+                const distToEndRoad = distanceToLineSegment(
+                    node.x, node.y,
+                    endRoad.x1, endRoad.y1, endRoad.x2, endRoad.y2
+                );
+                if (distToEndRoad < tolerance) {
+                    endNodeId = nodeId;
+                }
+            }
+            
+            if (!startNodeId || !endNodeId) {
+                if (window.debugMode) {
+                    debugLog("Vehicle path fallback - no valid nodes found", { 
+                        startNodeId, 
+                        endNodeId,
+                        availableNodes: Array.from(nodes.keys()),
+                        startRoad: `(${startRoad.x1},${startRoad.y1})->(${startRoad.x2},${startRoad.y2})`,
+                        endRoad: `(${endRoad.x1},${endRoad.y1})->(${endRoad.x2},${endRoad.y2})`
+                    });
+                }
+                
+                // Try to find different start and end roads that have intersections
+                let alternativeStartRoad = null;
+                let alternativeEndRoad = null;
+                
+                for (const road of allRoads) {
+                    let hasIntersection = false;
+                    for (const [nodeId, node] of nodes) {
+                        const distToRoad = distanceToLineSegment(
+                            node.x, node.y,
+                            road.x1, road.y1, road.x2, road.y2
+                        );
+                        if (distToRoad < tolerance) {
+                            hasIntersection = true;
+                            break;
+                        }
+                    }
+                    
+                    if (hasIntersection) {
+                        if (!alternativeStartRoad) {
+                            alternativeStartRoad = road;
+                        } else if (!alternativeEndRoad && road !== alternativeStartRoad) {
+                            alternativeEndRoad = road;
+                            break;
+                        }
+                    }
+                }
+                
+                if (alternativeStartRoad && alternativeEndRoad) {
+                    // Recursively try with roads that have intersections
+                    return generateVehiclePath(alternativeStartRoad, alternativeEndRoad, allRoads, intersections);
+                }
+                
+                // Final fallback: create simple path along single road
+                const numPoints = 5;
+                for (let i = 0; i <= numPoints; i++) {
+                    const t = i / numPoints;
+                    points.push({
+                        x: startRoad.x1 + (startRoad.x2 - startRoad.x1) * t,
+                        y: startRoad.y1 + (startRoad.y2 - startRoad.y1) * t
+                    });
+                }
+                return points;
+            }
+            
+            // Find shortest path using Dijkstra
+            const linkPath = dijkstraShortestPath(nodes, links, startNodeId, endNodeId);
+            
+            if (window.debugMode) {
+                debugLog("Vehicle link path found", { 
+                    startNode: startNodeId,
+                    endNode: endNodeId,
+                    pathLength: linkPath.length,
+                    links: linkPath,
+                    totalNodes: nodes.size,
+                    totalLinks: links.size,
+                    startRoad: `(${startRoad.x1},${startRoad.y1})->(${startRoad.x2},${startRoad.y2})`,
+                    endRoad: `(${endRoad.x1},${endRoad.y1})->(${endRoad.x2},${endRoad.y2})`
+                });
+            }
+            
+            // Generate points strictly along the link path
+            if (linkPath.length === 0) {
+                // Same node - travel along single road
+                const numPoints = 5;
+                for (let i = 0; i <= numPoints; i++) {
+                    const t = i / numPoints;
+                    points.push({
+                        x: startRoad.x1 + (startRoad.x2 - startRoad.x1) * t,
+                        y: startRoad.y1 + (startRoad.y2 - startRoad.y1) * t
+                    });
+                }
+            } else {
+                // Travel along each link in the path
+                for (let linkIndex = 0; linkIndex < linkPath.length; linkIndex++) {
+                    const linkId = linkPath[linkIndex];
+                    const link = links.get(linkId);
+                    
+                    // Determine direction of travel on this link
+                    let linkStartX, linkStartY, linkEndX, linkEndY;
+                    
+                    if (linkIndex === 0) {
+                        // First link: determine direction based on which node we're coming from
+                        const currentNode = nodes.get(startNodeId);
+                        const startNodeDist = Math.sqrt(
+                            Math.pow(currentNode.x - link.startX, 2) + 
+                            Math.pow(currentNode.y - link.startY, 2)
+                        );
+                        const endNodeDist = Math.sqrt(
+                            Math.pow(currentNode.x - link.endX, 2) + 
+                            Math.pow(currentNode.y - link.endY, 2)
+                        );
+                        
+                        if (startNodeDist < endNodeDist) {
+                            // Travel from start to end of link
+                            linkStartX = link.startX;
+                            linkStartY = link.startY;
+                            linkEndX = link.endX;
+                            linkEndY = link.endY;
+                        } else {
+                            // Travel from end to start of link
+                            linkStartX = link.endX;
+                            linkStartY = link.endY;
+                            linkEndX = link.startX;
+                            linkEndY = link.startY;
+                        }
+                    } else {
+                        // Subsequent links: continue from previous link's end point
+                        const prevLink = links.get(linkPath[linkIndex - 1]);
+                        const prevEndX = points[points.length - 1].x;
+                        const prevEndY = points[points.length - 1].y;
+                        
+                        // Determine which end of current link connects to previous
+                        const startDist = Math.sqrt(
+                            Math.pow(prevEndX - link.startX, 2) + 
+                            Math.pow(prevEndY - link.startY, 2)
+                        );
+                        const endDist = Math.sqrt(
+                            Math.pow(prevEndX - link.endX, 2) + 
+                            Math.pow(prevEndY - link.endY, 2)
+                        );
+                        
+                        if (startDist < endDist) {
+                            linkStartX = link.startX;
+                            linkStartY = link.startY;
+                            linkEndX = link.endX;
+                            linkEndY = link.endY;
+                        } else {
+                            linkStartX = link.endX;
+                            linkStartY = link.endY;
+                            linkEndX = link.startX;
+                            linkEndY = link.startY;
+                        }
+                    }
+                    
+                    // Add points along this link with smooth transitions at intersections
+                    const numSegments = 6; // More segments for smoother turning
+                    const startIdx = linkIndex === 0 ? 0 : 1; // Skip first point for subsequent links
+                    
+                    for (let i = startIdx; i <= numSegments; i++) {
+                        const t = i / numSegments;
+                        points.push({
+                            x: linkStartX + (linkEndX - linkStartX) * t,
+                            y: linkStartY + (linkEndY - linkStartY) * t
+                        });
+                    }
+                    
+                    // Add smooth transition points at intersections for better turning
+                    if (linkIndex < linkPath.length - 1) {
+                        const nextLinkId = linkPath[linkIndex + 1];
+                        const nextLink = links.get(nextLinkId);
+                        
+                        // Add a small curve at intersection for realistic turning
+                        const intersectionX = linkEndX;
+                        const intersectionY = linkEndY;
+                        
+                        // Determine next link direction
+                        let nextLinkStartX, nextLinkStartY;
+                        const nextStartDist = Math.sqrt(
+                            Math.pow(intersectionX - nextLink.startX, 2) + 
+                            Math.pow(intersectionY - nextLink.startY, 2)
+                        );
+                        const nextEndDist = Math.sqrt(
+                            Math.pow(intersectionX - nextLink.endX, 2) + 
+                            Math.pow(intersectionY - nextLink.endY, 2)
+                        );
+                        
+                        if (nextStartDist < nextEndDist) {
+                            nextLinkStartX = nextLink.startX;
+                            nextLinkStartY = nextLink.startY;
+                        } else {
+                            nextLinkStartX = nextLink.endX;
+                            nextLinkStartY = nextLink.endY;
+                        }
+                        
+                        // Add intermediate point for smooth turning
+                        const turnRadius = 5;
+                        const currentDir = Math.atan2(linkEndY - linkStartY, linkEndX - linkStartX);
+                        const nextDir = Math.atan2(nextLinkStartY - intersectionY, nextLinkStartX - intersectionX);
+                        const avgDir = (currentDir + nextDir) / 2;
+                        
+                        points.push({
+                            x: intersectionX + Math.cos(avgDir) * turnRadius,
+                            y: intersectionY + Math.sin(avgDir) * turnRadius
+                        });
+                    }
+                }
+            }
+            
+            return points;
+        }
+        
+        // Find roads connected to the given road through intersections
+        function findConnectedRoads(road, allRoads, intersections) {
+            const connected = [];
+            const tolerance = 10;
+            
+            // Check both ends of the road for intersections
+            const roadEnds = [
+                { x: road.x1, y: road.y1 },
+                { x: road.x2, y: road.y2 }
+            ];
+            
+            for (const roadEnd of roadEnds) {
+                // Find intersection at this road end
+                const intersection = intersections.find(int => 
+                    Math.sqrt(Math.pow(int.x - roadEnd.x, 2) + Math.pow(int.y - roadEnd.y, 2)) < tolerance
+                );
+                
+                if (intersection) {
+                    // Find other roads connected to this intersection
+                    for (const otherRoad of allRoads) {
+                        if (otherRoad === road) continue;
+                        
+                        const otherEnds = [
+                            { x: otherRoad.x1, y: otherRoad.y1 },
+                            { x: otherRoad.x2, y: otherRoad.y2 }
+                        ];
+                        
+                        for (const otherEnd of otherEnds) {
+                            const dist = Math.sqrt(
+                                Math.pow(intersection.x - otherEnd.x, 2) +
+                                Math.pow(intersection.y - otherEnd.y, 2)
+                            );
+                            
+                            if (dist < tolerance && !connected.includes(otherRoad)) {
+                                connected.push(otherRoad);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return connected;
         }
         
         // Render the road network
@@ -1184,6 +2129,115 @@
                     .attr("rx", 20)
                     .attr("ry", 20);
             });
+            
+            // Render roads function
+            function renderRoads() {
+                const svg = d3.select(".visualization-container svg");
+                svg.selectAll(".road").remove();
+                svg.selectAll(".parking-space").remove();
+                svg.selectAll(".parking-label").remove();
+                
+                const roadNetwork = roadLayouts[currentRoadLayout];
+                
+                // Render primary roads (thick black lines)
+                svg.selectAll(".primary-road")
+                    .data(roadNetwork.primaryRoads)
+                    .enter()
+                    .append("line")
+                    .attr("class", "road primary-road")
+                    .attr("x1", d => d.x1)
+                    .attr("y1", d => d.y1)
+                    .attr("x2", d => d.x2)
+                    .attr("y2", d => d.y2)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 6);
+                
+                // Render secondary roads (medium gray lines)
+                svg.selectAll(".secondary-road")
+                    .data(roadNetwork.secondaryRoads)
+                    .enter()
+                    .append("line")
+                    .attr("class", "road secondary-road")
+                    .attr("x1", d => d.x1)
+                    .attr("y1", d => d.y1)
+                    .attr("x2", d => d.x2)
+                    .attr("y2", d => d.y2)
+                    .attr("stroke", "#666")
+                    .attr("stroke-width", 4);
+                
+                // Render tertiary roads (thin light gray lines), excluding rivers
+                const nonRiverTertiary = roadNetwork.tertiaryRoads.filter((_, index) => index % 3 !== 0);
+                svg.selectAll(".tertiary-road")
+                    .data(nonRiverTertiary)
+                    .enter()
+                    .append("line")
+                    .attr("class", "road tertiary-road")
+                    .attr("x1", d => d.x1)
+                    .attr("y1", d => d.y1)
+                    .attr("x2", d => d.x2)
+                    .attr("y2", d => d.y2)
+                    .attr("stroke", "#999")
+                    .attr("stroke-width", 2);
+                
+                // Render rivers (blue lines from every third tertiary road)
+                const rivers = roadNetwork.tertiaryRoads.filter((_, index) => index % 3 === 0);
+                svg.selectAll(".river")
+                    .data(rivers)
+                    .enter()
+                    .append("line")
+                    .attr("class", "river")
+                    .attr("x1", d => d.x1)
+                    .attr("y1", d => d.y1)
+                    .attr("x2", d => d.x2)
+                    .attr("y2", d => d.y2)
+                    .attr("stroke", "blue")
+                    .attr("stroke-width", 3);
+                
+                // Render intersections
+                svg.selectAll(".intersection")
+                    .data(roadNetwork.intersections)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "intersection")
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y)
+                    .attr("r", 4)
+                    .attr("fill", "red");
+                
+                // Add 5 parking spaces near intersections
+                const parkingSpaces = createParkingSpaces(roadNetwork.intersections);
+                
+                // Render parking spaces as squares
+                svg.selectAll(".parking-space")
+                    .data(parkingSpaces)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "parking-space")
+                    .attr("x", d => d.x - 10)
+                    .attr("y", d => d.y - 10)
+                    .attr("width", 20)
+                    .attr("height", 20)
+                    .attr("fill", "yellow")
+                    .attr("stroke", "orange")
+                    .attr("stroke-width", 2)
+                    .attr("opacity", 0.8);
+                
+                // Add parking space labels
+                svg.selectAll(".parking-label")
+                    .data(parkingSpaces)
+                    .enter()
+                    .append("text")
+                    .attr("class", "parking-label")
+                    .attr("x", d => d.x)
+                    .attr("y", d => d.y + 5)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "10px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text(d => `P${d.id}`);
+            }
+            
+            renderRoads();
             
             // Draw primary roads
             roadNetwork.primaryRoads.forEach(road => {
@@ -1265,6 +2319,189 @@
             debugLog("Rendered road network", { layout: roadNetwork.name, scale: roadMapScale });
         }
         
+        // Render vehicles moving along roads
+        function renderVehicles(progress = 1.0) {
+            const svg = d3.select(".visualization-container svg");
+            svg.selectAll(".vehicle-group").remove();
+            
+            if (currentVehicleData.length === 0) return;
+            
+            // Debug: Draw vehicle paths to verify they follow roads
+            if (window.debugMode) {
+                svg.selectAll(".vehicle-path-debug").remove();
+                currentVehicleData.forEach((vehicle, index) => {
+                    const lineGenerator = d3.line()
+                        .x(d => d.x)
+                        .y(d => d.y)
+                        .curve(d3.curveLinear);
+                    
+                    svg.append("path")
+                        .attr("class", "vehicle-path-debug")
+                        .attr("d", lineGenerator(vehicle.points))
+                        .attr("stroke", vehicle.color)
+                        .attr("stroke-width", 2)
+                        .attr("stroke-dasharray", "5,5")
+                        .attr("fill", "none")
+                        .attr("opacity", 0.5);
+                });
+            }
+            
+            const vehicleGroups = svg.selectAll(".vehicle-group")
+                .data(currentVehicleData)
+                .enter()
+                .append("g")
+                .attr("class", "vehicle-group");
+                
+            vehicleGroups.each(function(vehicle) {
+                const group = d3.select(this);
+                const startTime = vehicle.startTime || 0;
+                const endTime = vehicle.endTime || 1.0;
+                
+                if (progress < startTime) return;
+                
+                const points = vehicle.points;
+                let vehicleProgress;
+                if (progress <= startTime) vehicleProgress = 0;
+                else if (progress >= endTime) vehicleProgress = 1.0;
+                else vehicleProgress = (progress - startTime) / (endTime - startTime);
+                
+                // Calculate current position along the path with improved interpolation
+                if (vehicleProgress > 0 && points.length > 0) {
+                    let x, y, angle = 0;
+                    
+                    if (vehicleProgress >= 1.0) {
+                        // Vehicle has reached the end - use final point
+                        const finalPoint = points[points.length - 1];
+                        x = finalPoint.x;
+                        y = finalPoint.y;
+                        
+                        // Calculate angle from second-to-last point for proper orientation
+                        if (points.length > 1) {
+                            const prevPoint = points[points.length - 2];
+                            angle = Math.atan2(finalPoint.y - prevPoint.y, finalPoint.x - prevPoint.x) * 180 / Math.PI;
+                        }
+                    } else {
+                        // Normal interpolation along path
+                        const totalDistance = calculateTotalPathDistance(points);
+                        const targetDistance = vehicleProgress * totalDistance;
+                        
+                        let currentDistance = 0;
+                        let segmentIndex = 0;
+                        
+                        // Find which segment contains the target distance
+                        for (let i = 0; i < points.length - 1; i++) {
+                            const segmentDistance = Math.sqrt(
+                                Math.pow(points[i + 1].x - points[i].x, 2) + 
+                                Math.pow(points[i + 1].y - points[i].y, 2)
+                            );
+                            
+                            if (currentDistance + segmentDistance >= targetDistance) {
+                                segmentIndex = i;
+                                break;
+                            }
+                            currentDistance += segmentDistance;
+                        }
+                        
+                        // Interpolate within the found segment
+                        const currentPoint = points[segmentIndex];
+                        const nextPoint = points[Math.min(segmentIndex + 1, points.length - 1)];
+                        const segmentDistance = Math.sqrt(
+                            Math.pow(nextPoint.x - currentPoint.x, 2) + 
+                            Math.pow(nextPoint.y - currentPoint.y, 2)
+                        );
+                        
+                        const remainingDistance = targetDistance - currentDistance;
+                        const segmentProgress = segmentDistance > 0 ? remainingDistance / segmentDistance : 0;
+                        
+                        x = currentPoint.x + (nextPoint.x - currentPoint.x) * segmentProgress;
+                        y = currentPoint.y + (nextPoint.y - currentPoint.y) * segmentProgress;
+                        
+                        // Calculate movement direction for smooth turning
+                        if (currentPoint !== nextPoint) {
+                            angle = Math.atan2(nextPoint.y - currentPoint.y, nextPoint.x - currentPoint.x) * 180 / Math.PI;
+                        }
+                    }
+                    
+                    // Create vehicle icon group at the current position
+                    const vehicleGroup = group.append("g")
+                        .attr("transform", `translate(${x - 10}, ${y - 8})`);
+                    
+                    // Vehicle body (rectangle with rounded corners)
+                    vehicleGroup.append("rect")
+                        .attr("x", 2)
+                        .attr("y", 4)
+                        .attr("width", 16)
+                        .attr("height", 8)
+                        .attr("rx", 2)
+                        .attr("ry", 2)
+                        .attr("fill", vehicle.color)
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 1)
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    // Vehicle windows
+                    vehicleGroup.append("rect")
+                        .attr("x", 4)
+                        .attr("y", 5.5)
+                        .attr("width", 5)
+                        .attr("height", 5)
+                        .attr("rx", 1)
+                        .attr("fill", "#87CEEB")
+                        .attr("opacity", 0.8)
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    vehicleGroup.append("rect")
+                        .attr("x", 11)
+                        .attr("y", 5.5)
+                        .attr("width", 5)
+                        .attr("height", 5)
+                        .attr("rx", 1)
+                        .attr("fill", "#87CEEB")
+                        .attr("opacity", 0.8)
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    // Vehicle wheels
+                    vehicleGroup.append("circle")
+                        .attr("cx", 5)
+                        .attr("cy", 12.5)
+                        .attr("r", 1.5)
+                        .attr("fill", "#333")
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    vehicleGroup.append("circle")
+                        .attr("cx", 15)
+                        .attr("cy", 12.5)
+                        .attr("r", 1.5)
+                        .attr("fill", "#333")
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    vehicleGroup.append("circle")
+                        .attr("cx", 5)
+                        .attr("cy", 3.5)
+                        .attr("r", 1.5)
+                        .attr("fill", "#333")
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    vehicleGroup.append("circle")
+                        .attr("cx", 15)
+                        .attr("cy", 3.5)
+                        .attr("r", 1.5)
+                        .attr("fill", "#333")
+                        .attr("transform", `rotate(${angle} 10 8)`);
+                    
+                    // Vehicle label
+                    group.append("text")
+                        .attr("x", x)
+                        .attr("y", y - 15)
+                        .attr("text-anchor", "middle")
+                        .attr("fill", vehicle.color)
+                        .attr("font-size", "10px")
+                        .attr("font-weight", "bold")
+                        .text(vehicle.id);
+                }
+            });
+        }
+        
         // Render trajectories with animation progress
         function renderTrajectories(progress = 1.0) {
             const svg = d3.select(".visualization-container svg");
@@ -1272,6 +2509,12 @@
             if (currentTrajectoryData.length === 0) {
                 generateTrajectories();
             }
+            if (currentVehicleData.length === 0) {
+                generateVehicles();
+            }
+            
+            // Render vehicles first (so they appear behind rabbits)
+            renderVehicles(progress);
             const trajectoryGroups = svg.selectAll(".trajectory-group")
                 .data(currentTrajectoryData)
                 .enter()
@@ -1631,15 +2874,21 @@
             // Render initial road network
             renderRoadNetwork();
             
-            // Generate and render trajectories
-            generateTrajectories();
-            renderTrajectories(0);
+            // Generate and render trajectories and vehicles after initialization
+            setTimeout(() => {
+                generateTrajectories();
+                generateVehicles();
+                renderTrajectories(0);
+            }, 100);
             
             // Set up event listeners
             document.getElementById('update-btn').addEventListener('click', () => {
+                debugLog("Update button clicked - reinitializing all elements");
+                renderRoads();
                 generateTrajectories();
+                generateVehicles();
                 renderTrajectories(0);
-                debugLog("Updated trajectories");
+                debugLog("Updated trajectories and vehicles based on current input values");
             });
             
             document.getElementById('play-btn').addEventListener('click', () => {
@@ -1651,8 +2900,20 @@
                     cancelAnimationFrame(animationId);
                     animationId = null;
                 }
+                
+                // Reset all input values to defaults using getElementById
+                document.getElementById('object-count').value = 5;
+                document.getElementById('vehicle-count').value = 5;
+                document.getElementById('parking-count').value = 5;
+                document.getElementById('road-size').value = 1.0;
+                
+                // Reset scale and regenerate everything
+                roadMapScale = 1.0;
+                renderRoads();
+                generateTrajectories();
+                generateVehicles();
                 renderTrajectories(0);
-                debugLog("Reset animation");
+                debugLog("Reset animation and all values");
             });
             
             document.getElementById('layout-selector').addEventListener('change', (e) => {
@@ -1664,16 +2925,37 @@
                 debugLog("Changed road layout", { layout: roadNetwork.name });
             });
             
-            // Road size slider
-            const roadSizeSlider = document.getElementById('road-size');
-            const roadSizeValue = document.getElementById('road-size-value');
+            // Object count input
+            const objectCountInput = document.getElementById('object-count');
             
-            roadSizeSlider.addEventListener('input', (e) => {
-                roadSizeValue.textContent = e.target.value;
-            });
+            function updateAll() {
+                debugLog("Updating all elements");
+                generateTrajectories();
+                generateVehicles();
+                renderRoads();
+                renderTrajectories(0);
+            }
+            
+            objectCountInput.addEventListener('change', updateAll);
+            objectCountInput.addEventListener('input', updateAll);
+            
+            // Vehicle count input
+            const vehicleCountInput = document.getElementById('vehicle-count');
+            
+            vehicleCountInput.addEventListener('change', updateAll);
+            vehicleCountInput.addEventListener('input', updateAll);
+            
+            // Parking count input event listener
+            const parkingCountInput = document.getElementById('parking-count');
+            
+            parkingCountInput.addEventListener('change', updateAll);
+            parkingCountInput.addEventListener('input', updateAll);
+            
+            // Road size input
+            const roadSizeInput = document.getElementById('road-size');
             
             document.getElementById('apply-size-btn').addEventListener('click', () => {
-                roadMapScale = parseFloat(roadSizeSlider.value);
+                roadMapScale = parseFloat(roadSizeInput.value);
                 renderRoadNetwork();
                 calculateRoadFollowingStats(); // Recalculate with new scale
                 renderTrajectories(0);
@@ -1695,8 +2977,11 @@
         // Make sure all functions are available globally
         window.renderTrajectories = renderTrajectories;
         window.generateTrajectories = generateTrajectories;
+        window.generateVehicles = generateVehicles;
+        window.renderVehicles = renderVehicles;
         window.initVisualization = initialize;
         window.currentTrajectoryData = currentTrajectoryData;
+        window.currentVehicleData = currentVehicleData;
         window.config = {
             animationDuration: 20000, // 20 seconds for animation
             objectColors: config.objectColors
